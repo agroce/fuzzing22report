@@ -19,7 +19,7 @@ for f in dirs:
             line = str(line, encoding="utf-8", errors='ignore')
             if "fuzzgoat" in line:
                 sig += line.split(" in ")[1]
-        if sig not in sigs:
+        if (sig not in sigs) and (sig != ""):
             print("NEW SIG:")
             print(sig)
             print("="*80)
