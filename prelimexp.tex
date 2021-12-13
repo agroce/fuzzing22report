@@ -1,5 +1,16 @@
-\begin{table}
+\section{Preliminary Experiments}
+
+\begin{table*}
 \begin{tabular}{l|r|r|r|r|r}
   Method & Min bugs & Max bugs & Avg bugs & Avg. scov\% & Avg. bcov \\
+  \hline
+  AFL on program only & 3 & 5 & 4.2 \\
+  \hline
+  AFL on random mutants, non-cumulative, final run only & 4 & 5 & 4.8 \\
+  AFL on random mutants, non-cumulative, all crashes/runs & 6 & 7 & 6.4 \\
+  \hline
+  AFL on random mutants, cumulative, final run only & 3 & 6 & 4.6 \\
+  AFL on random mutants, cumulative, all crashes/runs & 6 & 7 & 6.2\\
+  \hline
 \end{tabular}
-\end{table}
+\end{table*}
