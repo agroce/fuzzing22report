@@ -18,7 +18,7 @@ for f in dirs:
 
 with open("gcov.out", 'w') as outf:
     subprocess.call(["gcov -b fuzzgoat.c main.c"], shell=True, stdout=outf, stderr=outf)
-with open("gcov.out", 'w') as outf:
+with open("gcov.out", 'r') as outf:
     line_tot = 0.0
     line_exec_tot = 0.0
     branch_tot = 0.0
@@ -28,13 +28,13 @@ with open("gcov.out", 'w') as outf:
             ls = line.split()
             lc = int(ls[-1])
             line_tot += lc
-            percent = float(ls.split(":")[1].split("%")[0])
+            percent = float((line.split(":")[1]).split("%")[0])
             line_exec_tot += percent * lc
         if "Taken at least once" in line:
             ls = line.split()
             lc = int(ls[-1])
             branch_tot += lc
-            percent = float(ls.split(":")[1].split("%")[0])
+            percent = float((line.split(":")[1]).split("%")[0])
             branch_taken_tot += percent * lc
 print("Line cov:", line_exec_tot / line_tot)
 print("Branch cov:", branch_taken_tot / branch_tot)

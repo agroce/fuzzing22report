@@ -4,13 +4,17 @@
 \begin{tabular}{l|r|r|r|r|r}
   Method & Min bugs & Max bugs & Avg bugs & Avg. scov\% & Avg. bcov \\
   \hline
-  AFL on program only & 3 & 5 & 4.2 \\
+  AFL on program only & 3 & 5 & 4.2 & 81.73\% & 80.40\%\\
   \hline
-  AFL on random mutants, non-cumulative, final run only & 4 & 5 & 4.8 \\
-  AFL on random mutants, non-cumulative, all crashes/runs & 6 & 7 & 6.4 \\
+  AFL on random mutants, non-cumulative  & 6 & 7 & 6.4 & 81.70\% & 80.70\%\\
   \hline
-  AFL on random mutants, cumulative, final run only & 3 & 6 & 4.6 \\
-  AFL on random mutants, cumulative, all crashes/runs & 6 & 7 & 6.2\\
+  AFL on random mutants, cumulative/sequential & 6 & 7 & 6.2 & 81.77\%
+  & 80.90\%\\
   \hline
 \end{tabular}
+\caption{Results for preliminary experiments}
 \end{table*}
+
+Coverage differences were not statistically significant by Mann
+Whitney U test, but bug count differences between both methods and AFL
+without mutants were significant with $p$-value $< 0.006$.
