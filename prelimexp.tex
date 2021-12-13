@@ -1,17 +1,31 @@
 \section{Preliminary Experiments}
 
 \begin{table*}
-\begin{tabular}{l|r|r|r|r|r}
-  Method & Min bugs & Max bugs & Avg bugs & Avg. scov\% & Avg. bcov \\
+  \begin{centering}
+  \begin{tabular}{l||r|r|r||r|r|r||r|r|r}
+    & \multicolumn{3}{|c||}{Bugs} & \multicolumn{3}{|c||}{Stmt Cov} &
+                                                                    \multicolumn{3}{|c}{Branch Cov} \\
+    \hline
+  Method & Min & Max  & Avg & Min & Max & Avg
+                                                                  
+  & Min & Max & Avg \\
   \hline
-  AFL on program only & 3 & 5 & 4.2 & 81.73\% & 80.40\%\\
+  AFL on program only & 3 & 5 & 4.2 & 79.86\% & 84.37\% & 81.73\% &
+                                                                    78.36\%
+                                  & 81.35\% & 80.40\%\\
   \hline
-  AFL on random mutants, non-cumulative  & 6 & 7 & 6.4 & 81.70\% & 80.70\%\\
+  AFL on random mutants, non-cumulative  & 6 & 7 & 6.4 & 80.04\% &
+                                                                   84.90\%
+                      & 81.70\% & 79.85\% & 82.58\% & 80.70\%\\
   \hline
-  AFL on random mutants, cumulative/sequential & 6 & 7 & 6.2 & 81.77\%
-  & 80.90\%\\
+  AFL on random mutants, cumulative/sequential & 6 & 7 & 6.2 & 80.21\%
+                                                               &
+                                                                 84.90\%
+                      & 81.77\%
+  & 80.10\% & 82.34\% & 80.90\%\\
   \hline
-\end{tabular}
+  \end{tabular}
+  \end{centering}
 \caption{Results for preliminary experiments}
 \end{table*}
 
