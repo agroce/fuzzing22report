@@ -33,7 +33,7 @@ two dice and use it in future attempts, the problem is easier than if
 the dice have to be rolled from scratch each time.  However, it is not
 as easy as if good rolls of the second die can also be saved!
 
-If we fuzz a program without the first return statement:
+If we fuzz a program without the first {\tt return} statement:
 
 \begin{code}
   if (!hard1(input)) \{
@@ -58,3 +58,7 @@ fuzzing a similar program can produce inputs such that 1) they help fuzz the
 actual program under test and 2) those inputs are much harder, or
 essentially impossible, to
 generate for the original program using the fuzzer.
+
+Three points are important to note about this approach: first, fuzzing an arbitrary program would be of no use here.  Inputs useful in exploring that program would likely be useless in exploring the real target of fuzzing.  Second, if a modification has little semantic impact on the original program, then fuzzing that variation is, to a large extent, the same as fuzzing the original program, with the only cost being some additional fuzzer logistics overhead.  Finally, predicting which program variants will aid fuzzing seems inherently hard.  In this case, removing a statemeent was extremely useful; in other cases breaking out of a loop before it fails a check might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above, and will not include too many programs so dis-similar in semantics they provide no value.
+
+Program \emph{mutants} provide this source of variants, by design.
