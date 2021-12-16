@@ -22,7 +22,14 @@
                                                                &
                                                                  84.90\%
                       & 81.77\%
-  & 80.10\% & 82.34\% & 80.90\%\\
+                            & 80.10\% & 82.34\% & 80.90\%\\
+    \hline
+    AFL on prioritized mutants, non-cumulative  & 6 & 7 & 6.2 &
+                                                                81.25\%
+               & 84.37\% & 82.39\% & 80.60\% & 81.84\% & 81.20\% \\
+    \hline
+    AFL on prioritized mutants, cumulative/sequential  & 6 & 7 & 6.2 &
+    81.25\% & 84.90\% & 83.16\% & 80.10\% & 82.58\% & 81.39\%\\    
   \hline
   \end{tabular}
   \end{centering}
@@ -30,5 +37,5 @@
 \end{table*}
 
 Coverage differences were not statistically significant by Mann
-Whitney U test, but bug count differences between both methods and AFL
+Whitney U test, but bug count differences between all mutant-based methods and AFL
 without mutants were significant with $p$-value $< 0.006$.
