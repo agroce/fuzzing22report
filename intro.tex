@@ -1,1 +1,52 @@
 \section{Introduction}
+
+
+Consider the problem of fuzzing a program whose structure is as
+follows:
+
+\begin{code}
+  if (!hard1(input)) \{
+      return 0;
+  \}
+  if (!hard2(input)) \{
+      return 0;
+  \}
+  crash();   
+\end{code}
+
+Assume that conditions {\tt hard1} and {\tt hard2} are independent
+constraints on an input, both of which are difficult to achieve.  A
+normal mutation-based
+fuzzer such as AFL or libFuzzer attempting to reach the call to {\tt crash} will generally
+first have to construct an input satsifying {\tt hard1} and then,
+while preserving {\tt hard1}, modify that input until it also
+satisfies {\tt hard2}.  A key point to note is that if the fuzzer
+accidentally produces an input that is a good start on satisfying {\tt
+  hard2}, or even completely satisfies {\tt hard2}, such an input will
+be discarded, because execution never reaches the implementation of
+{\tt hard2} unless {\tt hard1} has already been ``solved.''
+
+However, if we first fuzz the mutant that deletes the first return statement:
+
+\begin{code}
+  if (!hard1(input)) \{
+    /* return 0; */
+  \}
+  if (!hard2(input)) \{
+      return 0;
+  \}
+  crash();   
+\end{code}
+
+\noindent then progress towards both {\tt hard1} and {\tt hard2} can
+be made \emph{at the same time}.  If a generated input progresses
+achievement of either {\tt hard1} or {\tt hard2} it will be kept and
+used in further fuzzing.   Of course, \emph{crashing inputs} for this
+modified program are seldom crashing inputs for the
+original program.  However, given a partial or total solution to {\tt
+  hard1} and a partial or total solution to {\tt hard2}, it should be
+much easier for a fuzzer to construct a real crashing input for the
+original program.  This is a very simple example of a case where
+fuzzing a similar program can produce inputs that 1) help fuzz the
+actual program under test and 2) where those inputs are much harder to
+generate for the original program.

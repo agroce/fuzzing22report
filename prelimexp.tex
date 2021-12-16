@@ -3,17 +3,19 @@
 \begin{table*}
   \begin{centering}
   \begin{tabular}{l||r|r|r||r|r|r||r|r|r}
-    & \multicolumn{3}{|c||}{Bugs} & \multicolumn{3}{|c||}{Stmt Cov} &
-                                                                    \multicolumn{3}{|c}{Branch Cov} \\
+    & \multicolumn{3}{|c||}{Distinct Faults} & \multicolumn{3}{|c||}{Statement Coverage} &
+                                                                    \multicolumn{3}{|c}{Branch Coverage} \\
     \hline
   Method & Min & Max  & Avg & Min & Max & Avg
                                                                   
   & Min & Max & Avg \\
-  \hline
+    \hline
+    \hline
   AFL on program only & 3 & 5 & 4.2 & 79.86\% & 84.37\% & 81.73\% &
                                                                     78.36\%
                                   & 81.35\% & 80.40\%\\
-  \hline
+    \hline
+    \hline
   AFL on random mutants, non-cumulative  & 6 & 7 & 6.4 & 80.04\% &
                                                                    84.90\%
                       & 81.70\% & 79.85\% & 82.58\% & 80.70\%\\
@@ -23,6 +25,7 @@
                                                                  84.90\%
                       & 81.77\%
                             & 80.10\% & 82.34\% & 80.90\%\\
+    \hline
     \hline
     AFL on prioritized mutants, non-cumulative  & 6 & 7 & 6.2 &
                                                                 81.25\%
