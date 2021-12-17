@@ -61,4 +61,18 @@ generate for the original program using the fuzzer.
 
 Three points are important to note about this approach: first, fuzzing an arbitrary program would be of no use here.  Inputs useful in exploring that program would likely be useless in exploring the real target of fuzzing.  Second, if a modification has little semantic impact on the original program, then fuzzing that variation is, to a large extent, the same as fuzzing the original program, with the only cost being some additional fuzzer logistics overhead.  Finally, predicting which program variants will aid fuzzing seems inherently hard.  In this case, removing a statemeent was extremely useful; in other cases breaking out of a loop before it fails a check might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above, and will not include too many programs so dis-similar in semantics they provide no value.
 
-Program \emph{mutants} provide this source of variants, by design.
+Program \emph{mutants} provide this such variants, by design.  Mutants are designed to show weaknesses in a testing effort, by showing
+the ability of a test suite to detect \emph{plausible bugs}.  The majority of such hypothetical bugs must be semantically similar enough to
+the original program that a test suite's effectiveness is meaningful for both original and mutated program.  Therefore, most program mutants
+will satisfy the condition of being close enough to the target of fuzzing.  Mutants are roughly evenly distributed over a program's source code,
+and modify only a single location.  Therefore most uninteresting mutants will generally be harmless, since fuzzing the mutant will be essentially
+fuzzing the original program, except for a small number of code paths.  Finally, mutation operators are varied enough to provide a good source
+of potentially useful mutants.  Most importantly, almost all mutation tools include at least statement deletion (to remove checks that impede
+fuzzing) and conditional changes (negation, and replacement with constant false and constant true).  These are the variants with the most
+obvious potential.
+
+Additionally, fuzzing program mutants is a \emph{useful activity in itself}.  Mutation testing is increasingly being applied in the real-world.
+A program worth fuzzing is probably a program worth examining from the perspective of mutation testing.  Examining mutants not detected by fuzzing
+can reveal opportunities to improve a fuzzing effort, either by helping it reach hard-to-cover paths or, more frequently, by improving the oracle
+(e.g., adding assertions about invariants a mutant causes to be violated, or even creating a new end-to-end fuzzing harness when a fault is
+not exposed by fuzzing only isolated components of a program).
