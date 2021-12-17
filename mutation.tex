@@ -6,3 +6,11 @@
 Mutation testing~\cite{MutationSurvey,budd1979mutation,demillo1978hints} is an approach to evaluating and improving tests.  Mutation testing introduces small syntactic changes into a program, under the assumption that if the original program was correct, then a program with slightly different semantics will be incorrect, and should be detected by effective tests.  Mutation testing is used in software engineering research, occasionally in industry at-scale, and in some critical  open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
 
 A mutation testing approach is defined by a set of mutation operators.  Such operators vary widely in the literature, though a few, such as deleting a small portion of code (such as a statement), negating a conditonal, or replacing arithmetic and relational operations (e.g., changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely used.
+
+For generating mutants, we use the Universal Mutator \cite{regexpMut} (\url{https://github.com/agroce/universalmutator}), which provides a wide variety of source-level mutants for almost any widely used programming language, and has been used extensively to mutate C, C++, Python, and Solidity code.
+
+\subsection{Fuzzing: Two Key Decisions}
+
+\subsubsection{Choosing the Mutants}
+
+\subsubsection{Using the Mutants}
