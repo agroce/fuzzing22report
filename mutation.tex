@@ -3,44 +3,137 @@
 
 \subsection{Mutation Testing}
 
-Mutation testing~\cite{MutationSurvey,budd1979mutation,demillo1978hints} is an approach to evaluating and improving tests.
-Mutation testing introduces small syntactic changes into a program, under the assumption that if the original program was correct, 
-then a program with slightly different semantics will be incorrect, and should be detected by effective tests. 
-Mutation testing is used in software engineering research, occasionally in industry at-scale, and in some critical 
-open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
+Mutation
+testing~\cite{MutationSurvey,budd1979mutation,demillo1978hints} is an
+approach to evaluating and improving tests.  MOButation testing
+introduces small syntactic changes into a program, under the
+assumption that if the original program was correct, then a program
+with slightly different semantics will be incorrect, and should be
+detected by effective tests.  Mutation testing is used in software
+engineering research, occasionally in industry at-scale, and in some
+critical open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
 
-A mutation testing approach is defined by a set of mutation operators.  Such operators vary widely in the literature,
-though a few, such as deleting a small portion of code (such as a statement), negating a conditonal, or replacing arithmetic and
-relational operations (e.g., changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely used.
+A mutation testing approach is defined by a set of mutation operators.
+Such operators vary widely in the literature, though a few, such as
+deleting a small portion of code (such as a statement), negating a
+conditonal, or replacing arithmetic and relational operations (e.g.,
+changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely
+used.
 
-For generating mutants, we use the Universal Mutator \cite{regexpMut} (\url{https://github.com/agroce/universalmutator}),
-which provides a wide variety of source-level mutants for almost any widely used programming language, and has been used
-extensively to mutate C, C++, Python, and Solidity code.
+For generating mutants, we use the Universal Mutator \cite{regexpMut}
+(\url{https://github.com/agroce/universalmutator}), which provides a
+wide variety of source-level mutants for almost any widely used
+programming language, and has been used extensively to mutate C, C++,
+Python, and Solidity code.
 
-In principle, the ways in which mutants could be incorporated into a fuzzing process are almost unlimited.  However, the basic
-approach can be simplified by considering the fuzzing of mutants as a preparatory stage for fuzzing the target, as in the
-introductory example.  The simplest approach is to split a given time-budget for fuzzing in two.  First, fuzz the mutants.
-Then, collect an input corpus from that fuzzing, and fuzz the target program as usual, but for half the desired time.
+In principle, the ways in which mutants could be incorporated into a
+fuzzing process are almost unlimited.  However, the basic approach can
+be simplified by considering the fuzzing of mutants as a preparatory
+stage for fuzzing the target, as in the introductory example.  The
+simplest approach is to split a given time-budget for fuzzing in two.
+First, fuzz the mutants.  Then, collect an input corpus from that
+fuzzing, and fuzz the target program as usual, but for half the
+desired time.
 
 \subsection{Fuzzing: Two Key Decisions}
 
-Given a set of all mutants of a target program, and a decision to split a given fuzzing budget into a mutant-fuzzing stage
-followed by a target-fuzzing stage, there are two major decisions to be made: how to select a subset of mutants, and how to
-carry out fuzzing the chosen mutants.
+Given a set of all mutants of a target program, and a decision to
+split a given fuzzing budget into a mutant-fuzzing stage followed by a
+target-fuzzing stage, there are two major decisions to be made: how to
+select a subset of mutants, and how to carry out fuzzing the chosen
+mutants.
 
 \subsubsection{Choosing the Mutants}
 
-For most programs, reasonable (e.g., 24 hour) fuzzing budgets, and approaches to fuzzing mutants discussed below, it is impossible to
-fuzz all the mutants of the target program.  For instance, if a program has a mere 1,000 lines of code, and 2,000 mutants (not an
-implausible number), a 12 hour mutant fuzzing budget where each mutant is fuzzed for five minutes only allows fuzzing of 144 mutants,
-less than 1\% of the total mutants.  Two obvious options offer themselves: purely random selection of mutants, under the assumption
-that we have no simple way to predict the good mutants and that good mutants will often be redundant.  For the second point, consider the
-example from the introduction.  While less effective than removing the {\tt return} statement, negating the condition, changing it to
-a constant false, or modifying a constant return value inside {\tt hard1} may all allow progress to be made on {\tt hard2} without first
-satisfying {\tt hard1}.  Other changes might relax the most difficult aspects of {\tt hard1} allowing progress on the easier aspects
-of the condition, and thus progress on {\tt hard2}.   Alternatively, while we cannot predict the best mutants, it might be reasonable
-to try to diversify the mutants selected using some kind of prioritization.  In particular, in our recent work on using mutants to
-evaluated static analysis tools \cite{QRS2021}, we proposed a scheme for ordering mutants for humans to examine.  That method is based
-on varying code location mutated, kind of mutants, and other elements that should also be relevant to fuzzing.
+For most programs, reasonable (e.g., 24 hour) fuzzing budgets, and
+approaches to fuzzing mutants discussed below, it is impossible to
+fuzz all the mutants of the target program.  For instance, if a
+program has a mere 1,000 lines of code, and 2,000 mutants (not an
+implausible number), a 12 hour mutant fuzzing budget where each mutant
+is fuzzed for five minutes only allows fuzzing of 144 mutants, less
+than 1\% of the total mutants.  Two obvious options offer themselves:
+purely random selection of mutants, under the assumption that we have
+no simple way to predict the good mutants and that good mutants will
+often be redundant.  For the second point, consider the example from
+the introduction.  While less effective than removing the {\tt return}
+statement, negating the condition, changing it to a constant false, or
+modifying a constant return value inside {\tt hard1} may all allow
+progress to be made on {\tt hard2} without first satisfying {\tt
+  hard1}.  Other changes might relax the most difficult aspects of
+{\tt hard1} allowing progress on the easier aspects of the condition,
+and thus progress on {\tt hard2}.  Alternatively, while we cannot
+predict the best mutants, it might be reasonable to try to diversify
+the mutants selected using some kind of prioritization.  In
+particular, in our recent work on using mutants to evaluated static
+analysis tools \cite{QRS2021}, we proposed a scheme for ordering
+mutants for humans to examine.  
+
+The mutant prioritization
+uses Gonzalez' Furthest-Point-First \cite{Gonzalez} (FPF) algorithm
+to \emph{rank} mutants, as earlier work had used it to rank test cases for identifying faults \cite{PLDI13}.
+An
+FPF ranking requires a distance metric $d$, and ranks items so that
+dissimilar ones appear earlier.  FPF is a
+greedy algorithm that proceeds by repeatedly adding the item with the
+\emph{maximum minimum distance to all previously ranked items}. Given an
+initial seed item $r_0$, a set $S$ of items to rank, and a distance
+metric $d$, FPF computes $r_i$ as
+$s \in S: \forall s' \in S: min_{ j < i}(d(s,r_j)) \geq min_{j <
+  i}(d(s',r_j))$.  The condition on $s$ is obviously true when
+$s = s'$, or when $s' = r_j$ for some $j < i$; the other cases for
+$s'$ force selection of \emph{some}
+max-min-distance $s$.
+
+
+The Universal Mutator \cite{regexpMut} tool's FPF metric $d$ is
+the sum of a set of measurements.  First, it adds a similarity
+ratio based on Levenshtein distance \cite{lev} for (1) the \emph{changes} (Levenshtein edits) from
+the original source code elements to
+the two mutants,  (2) the two original source code elements changed (in
+general, lines), and (3) the actual output mutant code.  These are
+weighted with multipliers of 5.0, 0.1, and 0.1, respectively; the type
+of change (mutation operator, roughly) dominates this part of the
+distance, because it best describes ``what the mutant did''; however,
+because many mutants will have the same change (e.g., changing {\tt +}
+to {\tt -}, the other values decide many cases.
+%The Python
+%{\tt Levenshtein} library's similarity ratio is used, as it is based
+%on true minimal string edits; it reports similarity ratios between 0.0
+%and 1.0.
+The metric also incorporates the distance in the source
+code between the locations of two mutants.  If the mutants are to
+different files, this adds 0.5; it also adds 0.25
+times the number of source lines separating the two mutants if they
+are in the same file, divided by 10, but caps the amount added at
+0.25.  The full metric, therefore is:
+
+$$ 5.0 \times r(\mathit{edit}_1, \mathit{edit}_2) + 0.1 \times r(\mathit{source}_1, \mathit{source}_2) +$$
+$$0.1 \times r(\mathit{mutant}_1, \mathit{mutant}_2) + 0.5 \times \mathit{not\_same\_file} +$$
+$$max(0.25, \frac{\mathit{line\_dist}(\mathit{mutant}_1, \mathit{mutant}_2)}{10})$$
+
+\noindent Where $r$ is a Levenshtein-based string similarity ratio,
+$\mathit{line\_dist}$ is the distance in a source file between
+two locations, in lines (zero if the locations are in different
+files), and $\mathit{not\_same\_file}$ is 0/1.
 
 \subsubsection{Using the Mutants}
+
+The second key choice is how to use the chosen mutants.  Assuming a fixed budget per mutant, the most
+basic choice is whether to fuzz each mutant ``from scratch'' (presumably using any existing corpus for
+fuzzing the target), which we call non-cumulative/parallel fuzzing,  or to use each mutant's output corpus to seed the next mutant, which we call cumulative/sequential fuzzing.  The cumulative/sequential
+approach has two potential advantages:
+
+\begin{enumerate}
+\item Mutants have some of the benefits of fuzzing with mutants, so hitting a key location that has been
+mutated may be more likely.
+\item The final corpus from the last-fuzzed mutant will contain few redundancies, reducing processing or
+fuzzer startup time for the target.
+\end{enumerate}
+
+On the other hand, it forces processing of the corpus after each
+mutant to remove inputs causing the next mutant to crash, and, more
+importantly, prevents fuzzing mutants in parallel.  The processing
+cost is due to the fact that before fuzzing a mutant or the target,
+any input corpus needs, for the AFL fuzzer at least, to be pruned, removing any
+crashing inputs that did not crash the previous mutant.  These should
+be kept, as they may represent uniquely detected faults.  Removing these sequentially, rather than in a single batch after all mutants, may remove inputs that could have been useful for some mutant they do not crash, but re-trying all inputs for each mutant is expensive.
