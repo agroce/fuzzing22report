@@ -1,5 +1,19 @@
 \section{Proposed Evaluation}
 
+In a full experimental evaluation, we will undertake to answer the following core research questions:
+
 \begin{itemize}
-  \item {\bf RQ1}: 
+  \item {\bf RQ1}: Does replacing time spent fuzzing a target program with time spent fuzzing mutants of the target program improve
+  the effectiveness of fuzzing?
+  \item {\bf RQ2:} Does using prioritization improve the effectiveness of fuzzing with mutants?
+  \item {\bf RQ3:} How do non-cumulative (parallel) and cumulative (sequential) mutant fuzzing compare?
   \end{itemize}
+  
+{\bf RQ1} is the overall question of whether any variant of fuzzing using mutants increases standard fuzzing evaluation metrics
+(unique faults detected and code coverage).  {\bf RQ2} and {\bf RQ3} consider some of the primary choices to be made in implementing fuzzing mutants.
+
+The experiments will be based on widely-used benchmarks, and conform to the standards proposed by Klees et. al \cite{evalfuzz}, e.g., using 10 or
+more runs of 24 hours each in experimental trials.  One simplifying factor in experiments on this question is that, since the approach concerns
+only the choice of fuzzing targets and seeds, a single widely-used fuzzer such as the latest version of AFL, is justified.  It seems clear that
+the advantages provided by fuzzing mutants should be orthogonal to the varying features of AFL, AFLPlusPlus, libFuzzer, and other commonly
+used fuzzers.
