@@ -3,14 +3,44 @@
 
 \subsection{Mutation Testing}
 
-Mutation testing~\cite{MutationSurvey,budd1979mutation,demillo1978hints} is an approach to evaluating and improving tests.  Mutation testing introduces small syntactic changes into a program, under the assumption that if the original program was correct, then a program with slightly different semantics will be incorrect, and should be detected by effective tests.  Mutation testing is used in software engineering research, occasionally in industry at-scale, and in some critical  open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
+Mutation testing~\cite{MutationSurvey,budd1979mutation,demillo1978hints} is an approach to evaluating and improving tests.
+Mutation testing introduces small syntactic changes into a program, under the assumption that if the original program was correct, 
+then a program with slightly different semantics will be incorrect, and should be detected by effective tests. 
+Mutation testing is used in software engineering research, occasionally in industry at-scale, and in some critical 
+open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
 
-A mutation testing approach is defined by a set of mutation operators.  Such operators vary widely in the literature, though a few, such as deleting a small portion of code (such as a statement), negating a conditonal, or replacing arithmetic and relational operations (e.g., changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely used.
+A mutation testing approach is defined by a set of mutation operators.  Such operators vary widely in the literature,
+though a few, such as deleting a small portion of code (such as a statement), negating a conditonal, or replacing arithmetic and
+relational operations (e.g., changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely used.
 
-For generating mutants, we use the Universal Mutator \cite{regexpMut} (\url{https://github.com/agroce/universalmutator}), which provides a wide variety of source-level mutants for almost any widely used programming language, and has been used extensively to mutate C, C++, Python, and Solidity code.
+For generating mutants, we use the Universal Mutator \cite{regexpMut} (\url{https://github.com/agroce/universalmutator}),
+which provides a wide variety of source-level mutants for almost any widely used programming language, and has been used
+extensively to mutate C, C++, Python, and Solidity code.
+
+In principle, the ways in which mutants could be incorporated into a fuzzing process are almost unlimited.  However, the basic
+approach can be simplified by considering the fuzzing of mutants as a preparatory stage for fuzzing the target, as in the
+introductory example.  The simplest approach is to split a given time-budget for fuzzing in two.  First, fuzz the mutants.
+Then, collect an input corpus from that fuzzing, and fuzz the target program as usual, but for half the desired time.
 
 \subsection{Fuzzing: Two Key Decisions}
 
+Given a set of all mutants of a target program, and a decision to split a given fuzzing budget into a mutant-fuzzing stage
+followed by a target-fuzzing stage, there are two major decisions to be made: how to select a subset of mutants, and how to
+carry out fuzzing the chosen mutants.
+
 \subsubsection{Choosing the Mutants}
+
+For most programs, reasonable (e.g., 24 hour) fuzzing budgets, and approaches to fuzzing mutants discussed below, it is impossible to
+fuzz all the mutants of the target program.  For instance, if a program has a mere 1,000 lines of code, and 2,000 mutants (not an
+implausible number), a 12 hour mutant fuzzing budget where each mutant is fuzzed for five minutes only allows fuzzing of 144 mutants,
+less than 1\% of the total mutants.  Two obvious options offer themselves: purely random selection of mutants, under the assumption
+that we have no simple way to predict the good mutants and that good mutants will often be redundant.  For the second point, consider the
+example from the introduction.  While less effective than removing the {\tt return} statement, negating the condition, changing it to
+a constant false, or modifying a constant return value inside {\tt hard1} may all allow progress to be made on {\tt hard2} without first
+satisfying {\tt hard1}.  Other changes might relax the most difficult aspects of {\tt hard1} allowing progress on the easier aspects
+of the condition, and thus progress on {\tt hard2}.   Alternatively, while we cannot predict the best mutants, it might be reasonable
+to try to diversify the mutants selected using some kind of prioritization.  In particular, in our recent work on using mutants to
+evaluated static analysis tools \cite{QRS2021}, we proposed a scheme for ordering mutants for humans to examine.  That method is based
+on varying code location mutated, kind of mutants, and other elements that should also be relevant to fuzzing.
 
 \subsubsection{Using the Mutants}
