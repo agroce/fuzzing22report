@@ -10,7 +10,11 @@ generated to fuzz the SUT can allow a fuzzer to explore more behaviors
 than spending the entire fuzzing budget on the SUT.  The approach
 works because fuzzing most mutants is ``almost'' fuzzing the SUT, but
 may change behavior in ways that allow a fuzzer to reach deeper
-program behaviors.  This approach has two additional important advantages:
+program behaviors.  Our preliminary results show that fuzzing mutants
+is trivial to implement, and provides clear, statistically significant, benefits in terms of fault
+detection for a non-trivial benchmark program; these benefits are
+robust to a variety of detailed choices as to how to make use of
+mutants in fuzzing.  The proposed approach has two additional important advantages:
 first, it is fuzzer-agnostic, applicable to any corpus-based fuzzer
 without requiring modification of the fuzzer; second, the fuzzing of
 mutants, in addition to aiding fuzzing the SUT, also gives developers

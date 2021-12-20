@@ -75,7 +75,38 @@ actual program under test and 2) those inputs are much harder, or
 potentially almost impossible, to
 generate by fuzzing the actual target program.
 
-Three points are important to note about this approach: first, fuzzing an arbitrary program would be of no use here.  Inputs useful in exploring that program would likely be useless in exploring the real target of fuzzing.  Second, if a modification has little semantic impact on the original program, then fuzzing that variation is, to a large extent, the same as fuzzing the original program, with the only cost being some additional fuzzer logistics overhead.  Finally, predicting which program variants will aid fuzzing seems inherently hard.  In this case, removing a statemeent was extremely useful; in other cases breaking out of a loop before it fails a check might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above), and will not include too many programs so dis-similar in semantics they provide no value.
+Three points are important to note about this approach: first, fuzzing
+an arbitrary program would be of no use here.  Inputs useful in
+exploring that program would likely be useless in exploring the real
+target of fuzzing.  Second, if a modification has little semantic
+impact on the original program, then fuzzing that variation is, to a
+large extent, the same as fuzzing the original program, with the only
+cost being some additional fuzzer logistics overhead.  For instance,
+fuzzing this variation of our example program:
+
+\begin{code}
+  if (!hard1(input)) \{
+      return 1;
+  \}
+  if (!hard2(input)) \{
+      return 0;
+  \}
+  crash();   
+\end{code}
+
+\noindent is, for purposes of input generation, no different than
+fuzzing the original target program.  Only exit codes from the program
+are affected, if the {\tt return} statement appears in {\tt main}.
+Similarly, a version removing the call to {\tt crash{}} will still result in the
+fuzzer attempting to ``push through'' {\tt hard1}, even though the
+result of complete success will be less dramatic until the input is
+applied to the actual target program.
+
+Finally, predicting which program variants will aid fuzzing seems
+inherently hard.  In this case, removing a well-chosen statement was
+extremely useful; in other cases breaking out of a loop before it
+fails a check (by adding  a {\tt break}) or skipping a check in loop
+(by adding a {\tt continue}) might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above), and will not include too many programs so dis-similar in semantics they provide no value.
 
 Program \emph{mutants} provide such variants, by design \cite{MutationSurvey}.  Mutants are designed to show weaknesses in a testing effort, by showing
 the ability of a test suite to detect \emph{plausible bugs}.  The majority of such hypothetical bugs must be semantically similar enough to

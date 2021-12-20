@@ -336,6 +336,7 @@
 
 
 \usepackage{code}
+\usepackage{balance}
 \usepackage{url}
 
 
@@ -362,17 +363,20 @@
 % author names and affiliations
 % use a multiple column layout for up to three different
 % affiliations
-\author{\IEEEauthorblockN{Michael Shell}
-\IEEEauthorblockA{Georgia Institute of Technology\\
-someemail@somedomain.com}
+\author{\IEEEauthorblockN{Alex Groce\\ and Goutamkumar Tulajappa Kalburgi}
+\IEEEauthorblockA{Northern Arizona University\\
+alex.groce@nau.edu, gk325@nau.edu}
 \and
-\IEEEauthorblockN{Homer Simpson}
-\IEEEauthorblockA{Twentieth Century Fox\\
-homer@thesimpsons.com}
+\IEEEauthorblockN{Claire Le Goues\\ and Kush Jain}
+\IEEEauthorblockA{Carnegie Mellon University\\
+  clegoues@cs.cmu.edu, kdjain@andrew.cmu.edu}
+
 \and
-\IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
-\IEEEauthorblockA{Starfleet Academy\\
-someemail@somedomain.com}}
+\IEEEauthorblockN{Rahul Gopinath}
+\IEEEauthorblockA{CISPA Saarland University\\
+  rahul@gopinath.org}
+
+}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -448,11 +452,16 @@ someemail@somedomain.com}}
 
 \input{mutation}
 
+
+
 \input{eval}
+
 
 \input{prelimexp}
 
 \input{related}
+
+
 
 \input{conclusions}
 
@@ -468,6 +477,8 @@ someemail@somedomain.com}}
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 %   (used to reserve space for the reference number labels box)
+
+\balance
 
 \bibliographystyle{IEEEtranS}
 \bibliography{bibliography}
