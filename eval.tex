@@ -5,15 +5,26 @@ In a full experimental evaluation, we will undertake to answer the following cor
 \begin{itemize}
   \item {\bf RQ1}: Does replacing time spent fuzzing a target program with time spent fuzzing mutants of the target program improve
   the effectiveness of fuzzing?
-  \item {\bf RQ2:} Does using prioritization improve the effectiveness of fuzzing with mutants?
+  \item {\bf RQ2:} Does using prioritization improve the effectiveness of fuzzing with mutants?  If so, which prioritizations perform best?
   \item {\bf RQ3:} How do non-cumulative (parallel) and cumulative (sequential) mutant fuzzing compare?
+  \item {\bf RQ4:} For non-cumulative mutant fuzzing, is improving the corpus by first fuzzing the target program when it has changed worthwhile?
   \end{itemize}
   
 {\bf RQ1} is the overall question of whether any variant of fuzzing using mutants increases standard fuzzing evaluation metrics
-(unique faults detected and code coverage).  {\bf RQ2} and {\bf RQ3} consider some of the primary choices to be made in implementing fuzzing mutants.
+(unique faults detected and code coverage).  {\bf RQ2}-{\bf RQ4} consider some of the primary choices to be made in implementing fuzzing mutants.
 
 The experiments will be based on widely-used benchmarks, and conform to the standards proposed by Klees et. al \cite{evalfuzz}, e.g., using 10 or
 more runs of 24 hours each in experimental trials.  One simplifying factor in experiments on this question is that, since the approach concerns
-only the choice of fuzzing targets and seeds, a single widely-used fuzzer such as the latest version of AFL, is justified.  It seems clear that
+only the choice of fuzzing targets and seeds, a single widely-used fuzzer, such as the latest version of AFL, is justified.  It seems clear that
 the advantages provided by fuzzing mutants should be orthogonal to the varying features of AFL, AFLPlusPlus, libFuzzer, and other commonly
-used fuzzers.
+used fuzzers.  Even fuzzers that solve constraints to try to cover new branches (e.g., Eclipser \cite{eclipser}) do not attempt to solve branches not on the coverage frontier, such as {\tt hard2} in our running example.
+
+However, in order to check our assumption, we plan to perform a limited set of experiments on at least one fuzzer that is very different than the primary fuzzer used, e.g., using libFuzzer as a check on an AFL-based evaluation.
+
+In addition to the primary research questions above, we plan to
+examine other practically important aspects of mutant fuzzing.  For
+instance, while we expect most gains to be derived from using corpus
+inputs to help fuzz the target itself, we also believe, based on our
+preliminary experiments discussed below, that some bugs may be found
+only by fuzzing a mutant.  How often does this happen on real
+programs, and why does it happen?  One possibility of interest is that the coarse heuristics many fuzzers use to avoid storing duplicate crashes \cite{semantic-crash-bucketing,mdebug} may sometimes discard non-redundant bugs, and that program mutants interact with AFL's heuristics to prevent this in some cases.

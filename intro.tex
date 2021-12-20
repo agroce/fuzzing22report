@@ -1,7 +1,8 @@
 \section{Introduction}
 
+Fuzzing is an essential tool for ensuring that software is robust, secure, and as error-free as possible \cite{ArtFuzz}.  However, even relatively simple program patterns can cause problems for fuzzing, despite the vast effort devoted to improving fuzzing techniques in both academic and industrial settings, recently.
 
-Consider the problem of fuzzing a program whose structure is as
+For instance, consider the problem of fuzzing a program whose structure is as
 follows:
 
 \begin{code}
@@ -22,19 +23,33 @@ first have to construct an input satsifying {\tt hard1} and then,
 while preserving {\tt hard1}, modify that input until it also
 satisfies {\tt hard2}.  A key point to note is that if the fuzzer
 accidentally produces an input that is a good start on satisfying {\tt
-  hard2}, or even completely satisfies {\tt hard2}, such an input will
+  hard2}, or even completely satisfies {\tt hard2}, \emph{before
+  ``solving'' {\tt hard1}}, such an input will
 be discarded, because execution never reaches the implementation of
-{\tt hard2} unless {\tt hard1} has already been ``solved.''  Even
-though the fuzzer must eventually satisfy both conditions, it can only
+{\tt hard2} unless {\tt hard1} has already been ``solved.''  There is
+no reason for the fuzzer's interestingness function to consider such
+inputs for adding to the fuzzing queue.
+
+Even
+though the fuzzer must eventually satisfy \emph{both} conditions, it can only
 work on them in the execution order.  By analogy, consider the problem
 of rolling a pair of \emph{ordered} dice.  If the goal is to roll two values above
 five, and you are allowed to ``save'' a good roll of the first of the
 two dice and use it in future attempts, the problem is easier than if
-the dice have to be rolled from scratch each time.  However, it is not
+the dice have to be rolled from scratch each time (i.e.,
+coverage-driven mutation-based fuzzing is usually more effective than
+pure random testing).  However, it is not
 as easy as if good rolls of the second die can also be saved, even if the first
-die has never produced a five or six!
+die has never produced a five or six!  In fact, if our die has 1,000
+sides, and we want each die rolled to have a value of 998 or above,
+allowing the second die to be saved reduces the number of required
+trials by close to one third, and the improvement increases with the
+difficulty of the second condition\footnote{The basic power of
+  coverage-guided fuzzing of course, is even more critical: allowing
+  saving the first die improves the number of rolls needed by orders
+  of magnitude, not a mere large percentage.}.
 
-If we fuzz a program without the first {\tt return} statement:
+If we fuzz a variant of our example program that is modified to omit the first {\tt return} statement:
 
 \begin{code}
   if (!hard1(input)) \{
@@ -57,17 +72,17 @@ much easier for a fuzzer to construct a crashing input for the
 original program.  This is a very simple example of a case where
 fuzzing a similar program can produce inputs such that 1) they help fuzz the
 actual program under test and 2) those inputs are much harder, or
-essentially impossible, to
-generate for the original program using the fuzzer.
+potentially almost impossible, to
+generate by fuzzing the actual target program.
 
-Three points are important to note about this approach: first, fuzzing an arbitrary program would be of no use here.  Inputs useful in exploring that program would likely be useless in exploring the real target of fuzzing.  Second, if a modification has little semantic impact on the original program, then fuzzing that variation is, to a large extent, the same as fuzzing the original program, with the only cost being some additional fuzzer logistics overhead.  Finally, predicting which program variants will aid fuzzing seems inherently hard.  In this case, removing a statemeent was extremely useful; in other cases breaking out of a loop before it fails a check might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above, and will not include too many programs so dis-similar in semantics they provide no value.
+Three points are important to note about this approach: first, fuzzing an arbitrary program would be of no use here.  Inputs useful in exploring that program would likely be useless in exploring the real target of fuzzing.  Second, if a modification has little semantic impact on the original program, then fuzzing that variation is, to a large extent, the same as fuzzing the original program, with the only cost being some additional fuzzer logistics overhead.  Finally, predicting which program variants will aid fuzzing seems inherently hard.  In this case, removing a statemeent was extremely useful; in other cases breaking out of a loop before it fails a check might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above), and will not include too many programs so dis-similar in semantics they provide no value.
 
 Program \emph{mutants} provide such variants, by design \cite{MutationSurvey}.  Mutants are designed to show weaknesses in a testing effort, by showing
 the ability of a test suite to detect \emph{plausible bugs}.  The majority of such hypothetical bugs must be semantically similar enough to
 the original program that a test suite's effectiveness is meaningful for the mutated program.  Therefore, most program mutants
 will satisfy the condition of being close enough to the target of fuzzing.  Mutants are roughly evenly distributed over a program's source code,
 and modify only a single location.  Therefore most uninteresting mutants will generally be harmless, since fuzzing the mutant will be essentially
-fuzzing the original program, except for a small number of code paths.  Finally, mutation operators are varied enough to provide a good source
+fuzzing the original program, except for a small fraction of code paths.  Finally, mutation operators are varied enough to provide a good source
 of potentially useful mutants.  Most importantly, almost all mutation tools include at least statement deletion (to remove checks that impede
 fuzzing) and conditional changes (negation, and replacement with constant false and constant true).  These are the variants with the most
 obvious potential for helping a fuzzer explore beyond a hard input constraint, as in the example above.
@@ -81,3 +96,5 @@ not exposed by fuzzing only isolated components of a program).  Mutation testing
 (\url{https://github.com/bitcoin/bitcoin/blob/master/doc/fuzzing.md}) revealed just such limits to the fuzzing, despite its 
 extremely high coverage and overall quality.  Mutation testing is supported by widely used and well-supported tools, and available for all
 commonly used (and many uncommonly used) programming languages.
+
+Moreover, by operating at the level of source modifications to the program being fuzzed, the proposed technique is agnostic as to the actual fuzzer used.  There is no need to implement fuzzing-of-mutants for each fuzzer of interest; the method operates completely at the level of orchestration of fuzzing results.

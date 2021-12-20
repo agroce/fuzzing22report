@@ -310,7 +310,30 @@ location = {Seattle, WA, USA},
 series = {FSE 2016}
 }
 
+@inproceedings{wang2021facilitating,
+  title={Facilitating Parallel Fuzzing with Mutually-Exclusive Task Distribution},
+  author={Wang, Yifan and Zhang, Yuchen and Pang, Chenbin and Li, Peng and Triandopoulos, Nikolaos and Xu, Jun},
+  booktitle={International Conference on Security and Privacy in Communication Systems},
+  pages={185--206},
+  year={2021},
+  organization={Springer}
+}
 
+@article{mdebug,
+  author    = {Josie Holmes and
+               Alex Groce},
+  title     = {Using mutants to help developers distinguish and debug (compiler)
+               faults},
+  journal   = {Softw. Test. Verification Reliab.},
+  volume    = {30},
+  number    = {2},
+  year      = {2020},
+  url       = {https://doi.org/10.1002/stvr.1727},
+  doi       = {10.1002/stvr.1727},
+  timestamp = {Wed, 01 Apr 2020 08:46:18 +0200},
+  biburl    = {https://dblp.org/rec/journals/stvr/HolmesG20.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 
 @article{HolmesLOC,
 author = {Holmes, Josie and Ahmed, Iftekhar and Brindescu, Caius and Gopinath, Rahul and Zhang, He and Groce, Alex},
@@ -574,6 +597,26 @@ series = {ICSE-SEIP '18}
   year={2019},
   publisher={Elsevier}
 }
+
+@inproceedings{AFLGo,
+author = {B\"{o}hme, Marcel and Pham, Van-Thuan and Nguyen, Manh-Dung and Roychoudhury, Abhik},
+title = {Directed Greybox Fuzzing},
+year = {2017},
+isbn = {9781450349468},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3133956.3134020},
+doi = {10.1145/3133956.3134020},
+abstract = {Existing Greybox Fuzzers (GF) cannot be effectively directed, for instance, towards problematic changes or patches, towards critical system calls or dangerous locations, or towards functions in the stack-trace of a reported vulnerability that we wish to reproduce. In this paper, we introduce Directed Greybox Fuzzing (DGF) which generates inputs with the objective of reaching a given set of target program locations efficiently. We develop and evaluate a simulated annealing-based power schedule that gradually assigns more energy to seeds that are closer to the target locations while reducing energy for seeds that are further away. Experiments with our implementation AFLGo demonstrate that DGF outperforms both directed symbolic-execution-based whitebox fuzzing and undirected greybox fuzzing. We show applications of DGF to patch testing and crash reproduction, and discuss the integration of AFLGo into Google's continuous fuzzing platform OSS-Fuzz. Due to its directedness, AFLGo could find 39 bugs in several well-fuzzed, security-critical projects like LibXML2. 17 CVEs were assigned.},
+booktitle = {Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security},
+pages = {2329–2344},
+numpages = {16},
+keywords = {directed testing, reachability, crash reproduction, patch testing, coverage-based greybox fuzzing, verifying true positives},
+location = {Dallas, Texas, USA},
+series = {CCS '17}
+}
+
+
 
 
 @misc{dataset-small,
