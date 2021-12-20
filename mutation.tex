@@ -135,19 +135,19 @@ and requires no deeper program analysis, dynamic information, or
 integration with a particular fuzzer.  However, an obvious alternative
 is to prioritize mutants according to their proximity to the
 \emph{coverage frontier} of an ongoing fuzzing effort.  That is,
-mutants that change code near untaken branches are given higher
-priority.  Mutants of code that is well-covered, on the other hand, or
-that are deep within completely-uncovered code,
-are lowered in priority.  If we imagine the example proposed in the
+mutants that change code near (in the program-dependence-graph or some other structural representation)  \emph{executed branches where both sides have not been taken} would be given higher
+priority.  Mutants of code that is well-covered, on the other hand, or, alternatively, mutants of
+code that is deep within completely-uncovered code,
+would be lowered in priority.  If we imagine the example proposed in the
 introduction to include a large amount of additional code, it is easy
 to see that this would likely prioritize the mutation of the {\tt
-  return} statement.
+  return} statement after {\tt hard1}.
 
 There are some drawbacks to this approach, however.  First, the
-prioritzation may not be as obviously good as it seems at first.
+prioritization may not be as obviously good as it seems at first.
 Imagine that the {\tt hard1} condition is indeed on the coverage
-frontier, but that a large amount of additional code is present after
-the branch is taken but before the {\tt return 0} statement.  The {\tt
+frontier, but that a large amount of additional easy-to-cover but branch-heavy code  is present after
+the {\tt hard1} branch is taken but before the {\tt return 0} statement.  The {\tt
   return} statement will be a low-priority mutant, since it is not at
 all close to the coverage frontier!  Negating the {\tt hard1}
 condition, of course, may also be helpful, but will not have the very

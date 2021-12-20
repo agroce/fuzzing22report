@@ -100,7 +100,19 @@ are affected, if the {\tt return} statement appears in {\tt main}.
 Similarly, a version removing the call to {\tt crash{}} will still result in the
 fuzzer attempting to ``push through'' {\tt hard1}, even though the
 result of complete success will be less dramatic until the input is
-applied to the actual target program.
+applied to the actual target program.  Similarly, fuzzing
+
+\begin{code}
+  if (!hard1(input)) \{
+      return 0;
+  \}
+  if (hard2(input)) \{
+      return 0;
+  \}
+  crash();
+\end{code}
+
+\noindent is, until {\tt hard1} is covered, indistinguishable from fuzzing the original target program.
 
 Finally, predicting which program variants will aid fuzzing seems
 inherently hard.  In this case, removing a well-chosen statement was
