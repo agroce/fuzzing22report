@@ -63,8 +63,9 @@ program has a mere 1,000 lines of code, and 2,000 mutants (not an
 implausible number), a 12 hour mutant fuzzing budget where each mutant
 is fuzzed for five minutes only allows fuzzing of 144 mutants, less
 than 1\% of the total mutants.  Two obvious options offer themselves:
+the first of these is
 purely random selection of mutants, under the assumption that we have
-no simple way to predict the good mutants and that good mutants will
+no simple way to predict the good mutants, and that good mutants will
 often be redundant.  For the second point, consider the example from
 the introduction.  While less effective than removing the {\tt return}
 statement, negating the condition, changing it to a constant false, or
@@ -72,10 +73,10 @@ modifying a constant return value inside {\tt hard1} may all allow
 progress to be made on {\tt hard2} without first satisfying {\tt
   hard1}.  Other changes might relax the most difficult aspects of
 {\tt hard1} allowing progress on the easier aspects of the condition,
-and thus progress on {\tt hard2}.  Alternatively, while we cannot
+and thus progress on {\tt hard2}.  Alternatively, even if we cannot
 predict the best mutants, it might be reasonable to try to diversify
 the mutants selected using some kind of prioritization.  In
-particular, in our recent work on using mutants to evaluated static
+particular, in our recent work on using mutants to evaluate static
 analysis tools \cite{QRS2021}, we proposed a scheme for ordering
 mutants for humans to examine.  
 
@@ -129,7 +130,7 @@ files), and $\mathit{not\_same\_file}$ is 0/1.
 
 The effectiveness of prioritization is an open question; for the problem of determining mutation score, it is known that mutation selection strategies can sometimes be actively harmful, less effective than purely random selection \cite{MutReduct}.  However, the statistical properties that make purely random selection attractive in predicting mutation score are not as important for using mutants to aid fuzzing.
 
-\paragraph{Alternative Prioritizations.}  The above scheme has the
+\paragraph{Alternative Prioritizations.}  The above prioritization scheme has the
 appeal that it is computable given only the source code and mutants,
 and requires no deeper program analysis, dynamic information, or
 integration with a particular fuzzer.  However, an obvious alternative
