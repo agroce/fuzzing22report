@@ -126,9 +126,19 @@ applied to the actual target program, and fuzzing
 
 \noindent is obviously a waste of time.
 
+Removing difficult checks is not the only potential win when fuzzing
+variants.  Consider the problem of fuzzing a compiler that includes a
+very expensive optimization pass.  Transforming the code by removing a
+call to that pass may not make it easier to hit a deep bug in another
+part of the code, in terms
+of behavior of the inputs, but might improve fuzzing throughput so much
+that paths through other parts of the code are explored much sooner,
+and thus the bug is found much more quickly.  In particular, if an
+optimization pass is very likely to have quadratic or worse behavior
+on fuzzer-generated inputs, disabling it may be tremendously productive.
 
-Finally, predicting which program variants will aid fuzzing seems
-inherently hard.  In this case, removing a well-chosen statement was
+Predicting which program variants will aid fuzzing seems
+inherently hard.  In the example, removing a well-chosen statement was
 extremely useful; in other cases breaking out of a loop before it
 fails a check (by adding  a {\tt break}) or skipping a check in loop
 (by adding a {\tt continue}) might be important, or turning a condition into a constant true --- or constant false!  Analysis capable of detecting reliably ``good'' changes seems likely to be fundamentally about as hard as fuzzing itself, or symbolic execution.  Recall however, that many variants that are not useful will also be harmless, in that they amount to simply fuzzing the target.  What we need is a source of similar programs that will include the (perhaps rare) high-value variants (such as removing the {\tt return} above), and will not include too many programs so dis-similar in semantics they provide no value.
