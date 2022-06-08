@@ -1,0 +1,99 @@
+\begin{table*}
+  \renewcommand{\arraystretch}{1.3}
+\caption{Results for preliminary experiments}
+  
+  \centering
+  \begin{tabular}{l||r|r|r||r|r|r||r|r|r}
+    & \multicolumn{3}{|c||}{Distinct Faults} & \multicolumn{3}{|c||}{Statement Coverage} &
+                                                                    \multicolumn{3}{|c}{Branch Coverage} \\
+    \hline
+  Method & Min & Max  & Avg & Min & Max & Avg
+                                                                  
+  & Min & Max & Avg \\
+    \hline
+    \hline
+  AFL on program only & 3 & 5 & 4.2 & 79.86\% & 84.37\% & 81.73\% &
+                                                                    78.36\%
+                                  & 81.35\% & 80.40\%\\
+    \hline
+    \hline
+  AFL on random mutants, non-cumulative  & {\bf 6} & {\bf 7} & {\bf 6.4} & 80.04\% &
+                                                                   {\bf
+                                                                                     84.90\%}
+                      & 81.70\% & 79.85\% & {\bf 82.58\%} & 80.70\%\\
+  \hline
+  AFL on random mutants, cumulative/sequential & {\bf 6} & {\bf 7} & 6.2 & 80.21\%
+                                                               &
+                                                                 {\bf 84.90\%}
+                      & 81.77\%
+                            & 80.10\% & 82.34\% & 80.90\%\\
+    \hline
+    \hline
+    AFL on prioritized mutants, non-cumulative  & {\bf 6} & {\bf 7} & 6.2 &
+                                                                {\bf 81.25\%}
+               & 84.37\% & {\bf 82.39\%} & {\bf 80.60\%} & 81.84\% & 81.20\% \\
+    \hline
+    AFL on prioritized mutants, cumulative/sequential  & {\bf 6} &
+                                                                   {\bf 7} & 6.2 &
+    {\bf 81.25\%} & {\bf 84.90\%} & 83.16\% & 80.10\% & {\bf 82.58\%} & {\bf 81.39\%}\\    
+  \hline
+  \end{tabular}
+  \label{tab:prelim}
+
+\end{table*}
+
+\section{Preliminary Experiments}
+
+
+
+Table \ref{tab:prelim} shows results of fuzzing the {\tt fuzzgoat}
+(\url{https://github.com/fuzzstati0n/fuzzgoat}) benchmark program for
+fuzzers, with and without using mutants to aid the fuzzing.  We
+applied our basic technique, using both random and prioritized (by
+Universal Mutator) mutant selection, and using non-cumulative and
+cumulative mutant fuzzing.  For non-cumulative mutant fuzzing, we did
+not perform an initial stage of fuzzing on the target program. The
+best value(s) for each evaluation measure are highlighted in bold.
+
+
+Each
+technique evaluated was used in 5 fuzzing attempts of 10 hours each.  The
+baseline for comparison is the latest Google release of  AFL (2.57b) on the {\tt fuzzgoat} program for 10
+hours, with no time spent in any effort other than fuzzing {\tt
+  fuzzgoat}.  The other approaches apply the basic methods for using
+mutants described above, for five hours, then fuzz using the resulting
+corpus for another five hours.  These approaches all spend a small
+fraction of the fuzzing budget restarting AFL and processing
+already-generated inputs (e.g., to make sure they don't crash the
+original program, even if they did not crash a mutant), rather than
+fuzzing either {\tt fuzzgoat} or a mutant.  The budget for fuzzing
+each mutant is fixed at five minutes, so only about 60 of the nearly
+3,800 mutants of {\tt fuzzgoat.c} can be fuzzed.  For the first two
+mutant runs, these mutants were chosen randomly each time; the second
+two runs used a fixed set of mutants, based on the default mutant
+prioritization scheme provided by the Universal Mutator, with the option to prioritze all statement deletions above other mutants set to false.  Coverage was measured using {\tt gcov} and faults were determined by using address sanitizer to determine locations of memory access violations, and examining the traces to determine the distinct faults.
+
+Fault
+detection was \emph{uniformly better} for all mutant-based approaches than
+for fuzzing without mutants; the minimum number of detected faults was
+better than the maximum number of faults found without using mutants.  Fault detection partly benefitted from crashes detected only during fuzzing of mutants.  However, even ignoring these crashes, three of the mutant-baed efforts detected six distinct faults, while fuzzing without mutants never detected six faults.  Means for the techniques without using crashes discovered during mutant fuzzing were, respectively (in the same order as the table): 4.8, 4.6, 5.0, and 5.0, still all higher than for fuzzing without mutants.  Using the crashes from mutant fuzzing, every mutant-based effort detected all vulnerabilities in fuzzgoat of which we are aware.
+
+
+Code coverage results were more ambigious, but the limited data
+suggests the prioritized mutant approaches may be more consistent in
+hitting hard-to-teach code than the other methods.  In particular, the highest branch coverage numbers were all reached by prioritized mutant fuzzing, and the worst statement and branch coverage values were from fuzzing without mutants.
+
+Coverage differences were not statistically significant by Mann
+Whitney U test, but bug count differences between all mutant-based methods and AFL
+without mutants were significant with $p$-value $< 0.006$.
+Differences in unique faults detected were not significant, when
+faults detected only during mutant fuzzing were discarded (though this
+is likely only due to the small sample size and range of values;
+p-values were around 0.2).
+
+While it is clear that for this benchmark program, fuzzing mutants
+provides an advantage, it is also clear that distinguishing between
+variations of the basic approach is not possible without considerably
+more experimental data across more subjects.
+
+Finally, we note that our experiments support our claim that the proposed technique is almost trivial to apply. We were able to implement mutant fuzzing in less than 30 lines of Python, and replacing AFL with another fuzzer would be trivial.
