@@ -1,28 +1,28 @@
 \section{Related Work}
 
 Given that getting past verification checks is one of the most common problems in fuzzing,
-(manually disabling verification checks is one of the most common proposals in practical~\cite{chromeadvice}
+(manually disabling verification checks is one of the most common proposals in practical \cite{chromeadvice}
 suggestions on improve the effectiveness of fuzzing)
 numerous previous researchers have tried to bypass such checks by
 patching the program itself.
-An early attempt to do this was Flayer~\cite{drewry2O07flayer} which
+An early attempt to do this was Flayer \cite{drewry2O07flayer} which
 provides a mechanism for instrumenting the program, altering the control flow,
 and stepping over function calls. The research also introduces a complementary
 fuzzer that makes use of Flayer for more effective fuzzing.
 
-A similar approach was taken in TaintScope~\cite{wang2010taintscope}, which claims to be the first \emph{checksum-aware} fuzzer. It detects checksum
+A similar approach was taken in TaintScope \cite{wang2010taintscope}, which claims to be the first \emph{checksum-aware} fuzzer. It detects checksum
 based integrity verification using branch profiling, and once found, it can
 bypass such checks by altering the control flow.
 
-CAFA~\cite{liu2018cafa} is another fuzzer that uses taint analysis to detect the
+CAFA \cite{liu2018cafa} is another fuzzer that uses taint analysis to detect the
 parts of the program that are involved in checksum based verification of
 input integrity. Once detected, it statically patches the program to bypass
 checksum verification of the input.
 
-The most closely related work is the T-Fuzz approach~\cite{tfuzz}, which focused specifically on removing sanity checks in programs in order to fuzz more deeply.  Our approach is motivated in part by the desire to remove sanity checks, but uses a more general and lightweight approach.  T-Fuzz used dynamic analysis to identify sanity checks, while we simply trust that program mutants will include many (or most) sanity checks.  Moreover, when a sanity check is hard to identify, but implemented by a function call, statement deletion mutants may in effect remove it where T-Fuzz will not.  Our approach also introduces changes that are not within the domain of T-Fuzz or the other fuzzers discussed above, e.g., changing conditions to include one-off values.  Finally, T-Fuzz worked around the fact that inputs for the modified program are not inputs for the real program under test using a symbolic execution step, while we simply hand the inputs generated for mutants to a fuzzer and trust a good fuzzer to make use of these ``hints'' to find inputs for the real program, if they are close enough to be useful.
+The most closely related work is the T-Fuzz approach \cite{tfuzz}, which focused specifically on removing sanity checks in programs in order to fuzz more deeply.  Our approach is motivated in part by the desire to remove sanity checks, but uses a more general and lightweight approach.  T-Fuzz used dynamic analysis to identify sanity checks, while we simply trust that program mutants will include many (or most) sanity checks.  Moreover, when a sanity check is hard to identify, but implemented by a function call, statement deletion mutants may in effect remove it where T-Fuzz will not.  Our approach also introduces changes that are not within the domain of T-Fuzz or the other fuzzers discussed above, e.g., changing conditions to include one-off values.  Finally, T-Fuzz worked around the fact that inputs for the modified program are not inputs for the real program under test using a symbolic execution step, while we simply hand the inputs generated for mutants to a fuzzer and trust a good fuzzer to make use of these ``hints'' to find inputs for the real program, if they are close enough to be useful.
 
 Mutation analysis has been used previously to detect anomalies in programs
-statically~\cite{arcaini2017novel}. As in our approach, the program variants
+statically \cite{arcaini2017novel}. As in our approach, the program variants
 are produced using mutation analysis, but the idea here is to look for variants
 that are semantically equivalent, but better in some specific sense than the
 original.
@@ -31,5 +31,5 @@ Arguably, UBSAN is a program transformer that explicitly doesn't preserve all th
 semantics (only the explicitly defined language semantics are preserved), and can improve fuzzing effectiveness.
 It detects undefined behavior by inserting crashes when such behavior is invoked.
 
-Finally, mutants may prove to be effective against anti-fuzzing~\cite{jung2019fuzzification}
+Finally, mutants may prove to be effective against anti-fuzzing \cite{jung2019fuzzification}
 techniques such as speed-bumps (a mutant could either remove the bump or simply decrease delay/wait loop parameters).

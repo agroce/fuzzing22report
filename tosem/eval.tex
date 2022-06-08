@@ -11,17 +11,14 @@ In a full experimental evaluation, we will undertake to answer the following cor
   \end{itemize}
   
 {\bf RQ1} is the overall question of whether any variant of fuzzing using mutants increases standard fuzzing evaluation metrics
-(unique faults detected and code coverage).  {\bf RQ2}-{\bf RQ4} consider some of the primary choices to be made in implementing fuzzing mutants.
+(unique faults detected and code coverage, primarily).  {\bf RQ2}-{\bf RQ4} consider some of the primary choices to be made in implementing fuzzing mutants.
 
 The experiments will be based on widely-used benchmarks, and conform to the standards proposed by Klees et. al \cite{evalfuzz}, e.g., using 10 or
 more runs of 24 hours each in experimental trials.  We will make every effort to identify and protect against the usual threats to validity in fuzzing experiments, by using a range of benchmark subjects and avoiding pitfalls such as measuring only crash counts bucketed crashes, rather than making an effort to identify actual distinct faults \cite{FuzzAppeal} (or using only crashes, not crashes and code coverage results).
 
-One simplifying factor in experiments on this question is that, since the approach concerns
-only the choice of fuzzing targets and seeds, a single widely-used fuzzer, such as the latest version of AFL, is justified.  It seems clear that
-the advantages provided by fuzzing mutants should be orthogonal to the varying features of AFL, AFLPlusPlus, libFuzzer, and other commonly
-used fuzzers.  Even fuzzers that solve constraints to try to cover new branches (e.g., Eclipser \cite{eclipser}) do not attempt to solve branches not on the coverage frontier, such as {\tt hard2} in our running example.
+Our plan is to make use of Google's FuzzBench \cite{metzman2021fuzzbench} (\url{https://google.github.io/fuzzbench/}) to perform primary experiments.  The lead of the FuzzBench team has extended an invitation to do so, and started discussing the details of compling and selecting mutants with us.  Using FuzzBench will allow us to perform extensive experiments in a well-curated configuration, over a number of important fuzzers and benchmarks.  Ideally, we can compare performance with and without (variants of) our approach on all of these fuzzers.  Use of FuzzBench will limit the potential for experimental error or poor experimental design choices, and make future comparison with other fuzzing techniques easier.
 
-However, in order to check our assumption, we plan to perform a limited set of experiments on at least one fuzzer that is very different than the primary fuzzer used, e.g., using libFuzzer as a check on an AFL-based evaluation.
+We would like to also evaluate our approach against T-Fuzz \cite{tfuzz}, but the last commit to the repository (\url{https://github.com/HexHive/T-Fuzz}) was in December of 2018, and our early efforts to get the tool to build and operate in an environment comparable to what will be used for other fuzzers has not been promising (the versions of angr and other required tools are ancient and do not work with recent versions of Linux).  We will continue to explore this possibility, and potentially run an independent smaller comparison outside the FuzzBench context, if we can get T-Fuzz to work using the T-Fuzz docker image.
 
 In addition to the primary research questions above, we plan to
 examine other practically important aspects of mutant fuzzing.  For

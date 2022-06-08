@@ -12,28 +12,34 @@
   & Min & Max & Avg \\
     \hline
     \hline
+   \multicolumn{10}{c}{Baseline (no mutants)} \\    
+    \hline
   AFL on program only & 3 & 5 & 4.2 & 79.86\% & 84.37\% & 81.73\% &
                                                                     78.36\%
                                   & 81.35\% & 80.40\%\\
     \hline
     \hline
-  AFL on random mutants, non-cumulative  & {\bf 6} & {\bf 7} & {\bf 6.4} & 80.04\% &
+    \multicolumn{10}{c}{AFL on random mutants} \\
+    \hline
+ Non-cumulative  & {\bf 6} & {\bf 7} & {\bf 6.4} & 80.04\% &
                                                                    {\bf
                                                                                      84.90\%}
                       & 81.70\% & 79.85\% & {\bf 82.58\%} & 80.70\%\\
   \hline
-  AFL on random mutants, cumulative/sequential & {\bf 6} & {\bf 7} & 6.2 & 80.21\%
+ Cumulative/sequential & {\bf 6} & {\bf 7} & 6.2 & 80.21\%
                                                                &
                                                                  {\bf 84.90\%}
                       & 81.77\%
                             & 80.10\% & 82.34\% & 80.90\%\\
     \hline
     \hline
-    AFL on prioritized mutants, non-cumulative  & {\bf 6} & {\bf 7} & 6.2 &
+    \multicolumn{10}{c}{AFL on prioritized mutants} \\
+    \hline
+    Non-cumulative  & {\bf 6} & {\bf 7} & 6.2 &
                                                                 {\bf 81.25\%}
                & 84.37\% & {\bf 82.39\%} & {\bf 80.60\%} & 81.84\% & 81.20\% \\
     \hline
-    AFL on prioritized mutants, cumulative/sequential  & {\bf 6} &
+   Cumulative/sequential  & {\bf 6} &
                                                                    {\bf 7} & 6.2 &
     {\bf 81.25\%} & {\bf 84.90\%} & 83.16\% & 80.10\% & {\bf 82.58\%} & {\bf 81.39\%}\\    
   \hline
