@@ -119,9 +119,13 @@ times the number of source lines separating the two mutants if they
 are in the same file, divided by 10, but caps the amount added at
 0.25.  The full metric, therefore is:
 
-$$ 5.0 \times r(\mathit{edit}_1, \mathit{edit}_2) + 0.1 \times r(\mathit{source}_1, \mathit{source}_2) +$$
-$$0.1 \times r(\mathit{mutant}_1, \mathit{mutant}_2) + 0.5 \times \mathit{not\_same\_file} +$$
-$$max(0.25, \frac{\mathit{line\_dist}(\mathit{mutant}_1, \mathit{mutant}_2)}{10})$$
+\begin{align*}
+d = \;&  5.0 \times r(\mathit{edit}_1, \mathit{edit}_2) + 0.1 \times
+r(\mathit{source}_1, \mathit{source}_2) + \\
+    & 0.1 \times r(\mathit{mutant}_1, \mathit{mutant}_2) + 0.5 \times
+    \mathit{not\_same\_file} + \\
+    & max(0.25, \frac{\mathit{line\_dist}(\mathit{mutant}_1, \mathit{mutant}_2)}{10})
+\end{align*}
 
 \noindent Where $r$ is a Levenshtein-based string similarity ratio,
 $\mathit{line\_dist}$ is the distance in a source file between
@@ -161,7 +165,7 @@ existing mutation testing results, it may be that mutants that have
 been killed are more useful in fuzzing, since they clearly produce a
 semantic change.  Equivalent mutants are harmless, but also useless.
 
-\paragraph{Full Mutant Analysis, Continuous Mutant Analysis:} Finally, for especially critical fuzzing targets, especially those
+\paragraph{Full Mutant Analysis, Continuous Mutant Analys.} Finally, for especially critical fuzzing targets, especially those
 that are continuously fuzzed in systems such as Google's OSS-Fuzz
 (\url{https://github.com/google/oss-fuzz}), it may be feasible to
 spend the resources to fuzz \emph{all} program mutants, both in order
