@@ -10,12 +10,13 @@ provides a mechanism for instrumenting the program, altering the control flow,
 and stepping over function calls. The research also introduces a complementary
 fuzzer that makes use of Flayer for more effective fuzzing.
 
-A similar approach was taken in TaintScope \cite{wang2010taintscope}, which claims to be the first \emph{checksum-aware} fuzzer. It detects checksum
-based integrity verification using branch profiling, and once found, it can
+A similar approach was taken in TaintScope \cite{wang2010taintscope},
+which claims to be the first \emph{checksum-aware} fuzzer.
+ It detects checksum-based integrity verification using branch profiling, and once found, it can
 bypass such checks by altering the control flow.
 
 CAFA \cite{liu2018cafa} is another fuzzer that uses taint analysis to detect the
-parts of the program that are involved in checksum based verification of
+parts of the program that are involved in checksum-based verification of
 input integrity. Once detected, it statically patches the program to bypass
 checksum verification of the input.
 
