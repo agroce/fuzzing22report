@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+
+%\usepackage{helvet} % Uncomment this (while commenting the above line) to use the Helvetica font
+
+% Margins
+\topmargin=-1in
+\textheight=8.5in
+\oddsidemargin=-10pt
+\textwidth=6.5in
+
+%\let\raggedleft\raggedright % Pushes the date (at the top) to the left, comment this line to have the date on the right
+
+\begin{document}
+\section{Changes}
+\subsection{Changes requested by Reviewer1}
+\begin{itemize}
+\item \textbf{Formula add $d:=$ in front of the equation.} \\
+We have added this in front of the formula.
+
+\item \textbf{$max(0.25, ...)$ should be probably $min()$, which would match the
+textual description with: ``, but caps the amount added at 0.25''.}\\
+Note that the textual description clearly says that we \emph{cap} the amount
+added at 0.25. That is, the maximum is 0.25.
+\item \textbf{Change Alternative Prioritizations.: to Alternative
+Prioritizations:}\\
+We have updated the punctuation..
+
+\item \textbf{Change Full Mutant Analysis, Continuous Mutant Analysis:: to Full Mutant
+Analysis, Continuous Mutant Analysis:}\\
+We have updated the punctuation.
+
+\item \textbf{Change hard-to-teach to hard-to-reach.}\\
+We have fixed the spelling mistake.
+
+\item \textbf{5555 is the wrong year in citation 20.}\\
+We have fixed the year in citation.
+
+\item \textbf{
+The RQs should be refined. RQ1 resembles the overall question of whether this
+method is effective. RQ2 and RQ3 are sub-question that try to answer this for
+changes along different dimensions in the solutions space. Nevertheless, those
+questions are important. A question in a similar direction would be: How much of
+a budget should be spent on the fuzzing of the mutants?
+RQ4 is not clear to me.
+In addition to the existing questions, I think the submission could be
+strengthened by answering the question of what kind of mutations have the
+strongest impact. Do specific mutations have almost no effect? Or are some
+counter-productive?
+}
+We have reformulated all the RQs.
+
+
+\end{itemize}
+\subsection{Changes requested by Reviewer3}
+\begin{itemize}
+\item \textbf{Less than 1\%" does not seem correct. 144 / 2000 = 7.2\%}\\
+We have changed this to less than 10\%.
+
+\item \textbf{Finally, for especially critical fuzzing targets, especially
+those" : the first use of "especially" is superfluous.}\\
+Removed the first use.
+
+\item \textbf{In fact, a CI-style continuous fuzzing effort could in principle
+alternative fuzzing the target program with a rolling sequence of mutants --
+something is missing here.}\\
+Fixed it to: In fact, a CI-style continuous fuzzing effort could in principle be
+an alternative to fuzzing the target program with a rolling sequence of mutants
+
+\item \textbf{"(ro at least those that ever generated useful inputs)" : Change
+ro to to} \\
+Fixed the spelling mistake.
+
+\item \textbf{demarction to demarcation}\\
+Fixed the spelling mistake.
+
+\item \textbf{While the total computing resources required to fuzz the same
+number of mutants are constant, that one approach is (embarrassingly) parallel
+is a significant advantage in modern multicore contexts." : The second part
+sounds a bit overcomplicated,}
+
+Fixed it to: While the total computing resources required to fuzz the same
+number of mutants are constant, an approach that is (embarrassingly) parallel
+has a significant advantage in modern multicore contexts.                                          
+
+\item \textbf{checksum based to checksum-based}\\
+Fixed the spelling mistake.
+
+\item \textbf{three of the mutant-baed efforts to three of the mutant-based
+efforts}\\
+Fixed the spelling mistake.
+
+\end{itemize}
+
+
+\end{document}
