@@ -22,6 +22,7 @@
 
 import glob
 import os
+from pathlib import Path
 import random
 import shutil
 import filecmp
@@ -67,7 +68,6 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
 
     SOURCE_EXTENSIONS = [".cc"] #[".c", ".cc", ".cpp", ".cxx", ".h", ".hpp", ".hxx"]
     NUM_MUTANTS = 1 #(23 / 2) * 60 / 5 # 23 hours - half fuzzing mutants * 60 (convert to mins) / 5 mins/mutant
-
     # Use heuristic to try to find benchmark directory, otherwise look for all files in the current directory.
     subdirs = [name for name in os.listdir(src) if os.path.isdir(os.path.join(src, name))]
     benchmark_src_dir = src
@@ -77,16 +77,40 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
             break
 
     source_files = []
-    for extension in SOURCE_EXTENSIONS:   
+    for extension in SOURCE_EXTENSIONS:  
         source_files += glob.glob(f"{benchmark_src_dir}/**/*{extension}", recursive=True)
-    
+
+    mutants = []
+    for source_file in source_files:
+        source_dir = os.path.dirname(source_file).split(src, 1)[1]
+        Path(f"{mutate_dir}/{source_dir}").mkdir(parents=True, exist_ok=True)
+        os.system(f"mutate {source_file} --mutantDir {mutate_dir}/{source_dir} --noCheck > /dev/null")
+        source_base = os.path.basename(source_file).split(".")[0]
+        mutants_glob = glob.glob(f"{mutate_dir}/{source_dir}/{source_base}.mutant.*")
+        mutants += [f"{source_dir}/{mutant.split('/')[-1]}"[1:] for mutant in mutants_glob]
+
+    random.shuffle(mutants)    
+    with open(f"{mutate_dir}/mutants.txt", "w") as f:
+        f.writelines("%s\n" % l for l in mutants)
+
+    NUM_PRIORITIZED = min(NUM_MUTANTS * 100, len(mutants))
+
+    os.system(f"prioritize_mutants {mutate_dir}/mutants.txt {mutate_dir}/prioritize_mutants_sorted.txt {NUM_PRIORITIZED} --sourceDir {src} --mutantDir {mutate_dir} > {mutate_dir}/prioritize_mutants.txt")
+    prioritized_list = []
+    with open(f"{mutate_dir}/prioritize_mutants_sorted.txt", "r") as f:
+        prioritized_list = f.read().splitlines()
+
     num_non_buggy = 1
+    ind = 0
     while num_non_buggy <= NUM_MUTANTS:
-        source_file = random.choice(source_files)
+        mutant = prioritized_list[ind] # mutants[ind] 
+        suffix = "." + mutant.split(".")[-1]
+        mpart = ".mutant." + mutant.split(".mutant.")[1]
+        source_file = f"{src}/{mutant.replace(mpart, suffix)}"
         print(source_file)
-        os.system(f"cp {source_file} {mutate_dir}/orig.c")
-        os.system(f"mutate {source_file} --mutantDir {mutate_dir} --fuzz --noCheck")
-        os.system(f"cp {mutate_dir}/fuzz.out {source_file}")
+        print(f"{mutate_dir}/{mutant}")
+        os.system(f"cp {source_file} {mutate_dir}/orig")
+        os.system(f"cp {mutate_dir}/{mutant} {source_file}")
         try:
             new_fuzz_target = f"{os.getenv('FUZZ_TARGET')}.{num_non_buggy}"
             os.system(f"rm -rf {out}/*")
@@ -97,7 +121,8 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
         except Exception as e:
             print(e)
             pass
-        os.system(f"cp {mutate_dir}/orig.c {source_file}")
+        os.system(f"cp {mutate_dir}/orig {source_file}")
+        ind += 1
     
     os.system(f"cp {mutate_scripts}/orig_build.sh {src}/build.sh")
     os.system(f"rm -rf {out}/*")
@@ -111,10 +136,21 @@ def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer."""
     TIMEOUT = 500
     mutants = glob.glob(f"{target_binary}.*")
+    input_corpus_dir = "/storage/input_corpus"
+    os.mkdir("/storage")
+    os.mkdir(input_corpus_dir)
+    os.environ['AFL_SKIP_CRASHES'] = "1"
+
     for mutant in mutants:
-        with time_limit(TIMEOUT):
-            aflplusplus_fuzzer.fuzz(input_corpus,
-                                    output_corpus,
-                                    mutant)
-    
+        os.system(f"cp -r {input_corpus_dir}/* {input_corpus}/*")
+        try:
+            with time_limit(TIMEOUT):
+                aflplusplus_fuzzer.fuzz(input_corpus,
+                                        output_corpus,
+                                        mutant)
+        except TimeoutException as e:
+            pass
+        os.system(f"cp -r {output_corpus}/* {input_corpus_dir}/*")
+
+    os.system(f"cp -r {input_corpus_dir}/* {input_corpus}/*")
     aflplusplus_fuzzer.fuzz(input_corpus, output_corpus, target_binary)
