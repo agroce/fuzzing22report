@@ -16,7 +16,7 @@ critical open-source work~\cite{mutKernel,mutGoogle,mutFacebook}.
 A mutation testing approach is defined by a set of mutation operators.
 Such operators vary widely in the literature, though a few, such as
 deleting a small portion of code (such as a statement), negating a
-conditonal, or replacing arithmetic and relational operations (e.g.,
+conditional, or replacing arithmetic and relational operations (e.g.,
 changing {\tt +} to {\tt -} or {\tt ==} to {\tt <=}), are very widely
 used.
 
@@ -62,7 +62,7 @@ fuzz all the mutants of the target program.  For instance, if a
 program has a mere 1,000 lines of code, and 2,000 mutants (not an
 implausible number), a 12 hour mutant fuzzing budget where each mutant
 is fuzzed for five minutes only allows fuzzing of 144 mutants, less
-than 1\% of the total mutants.  Two obvious options offer themselves:
+than 10\% of the total mutants.  Two obvious options offer themselves:
 the first of these is
 purely random selection of mutants, under the assumption that we have
 no simple way to predict the good mutants, and that good mutants will
@@ -119,9 +119,13 @@ times the number of source lines separating the two mutants if they
 are in the same file, divided by 10, but caps the amount added at
 0.25.  The full metric, therefore is:
 
-$$ 5.0 \times r(\mathit{edit}_1, \mathit{edit}_2) + 0.1 \times r(\mathit{source}_1, \mathit{source}_2) +$$
-$$0.1 \times r(\mathit{mutant}_1, \mathit{mutant}_2) + 0.5 \times \mathit{not\_same\_file} +$$
-$$max(0.25, \frac{\mathit{line\_dist}(\mathit{mutant}_1, \mathit{mutant}_2)}{10})$$
+\begin{align*}
+d = \;&  5.0 \times r(\mathit{edit}_1, \mathit{edit}_2) + 0.1 \times
+r(\mathit{source}_1, \mathit{source}_2) + \\
+    & 0.1 \times r(\mathit{mutant}_1, \mathit{mutant}_2) + 0.5 \times
+    \mathit{not\_same\_file} + \\
+    & max(0.25, \frac{\mathit{line\_dist}(\mathit{mutant}_1, \mathit{mutant}_2)}{10})
+\end{align*}
 
 \noindent Where $r$ is a Levenshtein-based string similarity ratio,
 $\mathit{line\_dist}$ is the distance in a source file between
@@ -161,15 +165,16 @@ existing mutation testing results, it may be that mutants that have
 been killed are more useful in fuzzing, since they clearly produce a
 semantic change.  Equivalent mutants are harmless, but also useless.
 
-\paragraph{Full Mutant Analysis, Continuous Mutant Analysis:} Finally, for especially critical fuzzing targets, especially those
+\paragraph{Full Mutant Analysis, Continuous Mutant Analysis.} Finally,
+for critical fuzzing targets, especially those
 that are continuously fuzzed in systems such as Google's OSS-Fuzz
 (\url{https://github.com/google/oss-fuzz}), it may be feasible to
 spend the resources to fuzz \emph{all} program mutants, both in order
 to identify undetected mutants and to collect the full corpus of
 inputs generated using mutants.  In fact, a CI-style continuous
-fuzzing effort could in principle alternative fuzzing the target
-program with a rolling sequence of mutants (ro at least those that ever generated useful
-inputs), in practice elminating the clear demarction between fuzzing
+fuzzing effort could in principle be an alternative to fuzzing the target
+program with a rolling sequence of mutants (to at least those that ever generated useful
+inputs), in practice eliminating the clear demarcation between fuzzing
 mutants and fuzzing the target.
 
 Finally, while we do not consider the problem here, in repeated efforts it
@@ -181,6 +186,7 @@ differing program paths, then the mutant is almost certainly not worth
 fuzzing again.
 
 \subsubsection{Using the Mutants}
+\label{sec:using}
 
 The second key choice is how to \emph{use} the chosen mutants.
 Assuming a fixed fuzzing budget per mutant, the most
@@ -210,7 +216,15 @@ single batch after all mutants, may remove inputs that could have been
 useful for some mutant they do not crash in the future, but re-trying
 all inputs for each mutant is expensive.
 
-When only one CPU is available for fuzzing, the sequential vs. parallel nature of the approaches does not matter, but if many CPUs are available, then fuzzing many mutants at once is an obviously attractive proposition.  While the total computing resources required to fuzz the same number of mutants are constant, that one approach is (embarrassingly) parallel is a significant advantage in modern multicore contexts.  In fact, fuzzing mutants to some extent offers a simple solution to the problems of work division and communication overhead that trouble parallel fuzzing in general \cite{wang2021facilitating}.
+When only one CPU is available for fuzzing, the sequential vs. parallel nature
+of the approaches does not matter, but if many CPUs are available,
+then fuzzing many mutants at once is an obviously attractive proposition.
+While the total computing resources required to fuzz the same number of mutants
+are constant, an approach that is (embarrassingly) parallel has a significant
+advantage in modern multicore contexts.
+In fact, fuzzing mutants to some extent offers a simple solution to the problems
+of work division and communication overhead that trouble parallel fuzzing in
+general \cite{wang2021facilitating}.
 
 There are other minor variations.  For instance, if the program under
 test has changed since the generation of any existing corpus, it may

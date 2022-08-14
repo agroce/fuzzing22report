@@ -3,27 +3,28 @@
 In a full experimental evaluation, we will undertake to answer the following core research questions:
 
 \begin{itemize}
-  \item {\bf RQ1}: Does replacing time spent fuzzing a target program with time spent fuzzing mutants of the target program improve
-  the effectiveness of fuzzing?
+  \item {\bf RQ1}: Can replacing time spent fuzzing a target program with time spent fuzzing mutants of the target program, under at least one configuration, improve
+  the effectiveness of fuzzing on average over a variety of target programs?
   \item {\bf RQ2:} Does using prioritization improve the effectiveness of fuzzing with mutants?  If so, which prioritizations perform best?
   \item {\bf RQ3:} How do non-cumulative (parallel) and cumulative (sequential) mutant fuzzing compare?
-  \item {\bf RQ4:} For non-cumulative mutant fuzzing, is improving the corpus by first fuzzing the target program when it has changed worthwhile?
+  \item {\bf RQ4:} How does impact of using mutants vary with the fraction of the fuzzing budget devoted to fuzzing mutants, given a good configuration based on results from {\bf RQ2} and {\bf RQ3}?
+  \item {\bf RQ5:} Are certain kinds of mutants generally more useful for fuzzing, or generally not useful?  Are these patterns the same or different for new path discovery and novel bug detection?
   \end{itemize}
   
-{\bf RQ1} is the overall question of whether any variant of fuzzing using mutants increases standard fuzzing evaluation metrics
-(unique faults detected and code coverage, primarily).  {\bf RQ2}-{\bf RQ4} consider some of the primary choices to be made in implementing fuzzing mutants.
+{\bf RQ1} is the overall question of whether \emph{any} variant of fuzzing using mutants explored increases standard fuzzing evaluation metrics
+(unique faults detected and code coverage, primarily).  {\bf RQ2}-{\bf RQ5} consider some of the primary choices to be made in implementing fuzzing mutants, and help investigate why mutants are helpful, supposing an affirmative answer to {\bf RQ1}.
 
-The experiments will be based on widely-used benchmarks, and conform to the standards proposed by Klees et. al \cite{evalfuzz}, e.g., using 10 or
+{\bf RQ2} and {\bf RQ3} and are straightforward, aiming to compare the effectivness of different basic approaches to using mutants in fuzzing (random or systematic selection of mutants, cumulative and non-cumulative approaches, respectively).  Because exploring all combinations of mutant-fuzzing approach and budget would require a prohibitive number of experimental runs, we plan to focus the investigation of {\bf RQ4} on answering the question, given a best-practice for using mutants in a baseline one-half-budget setting.  The core idea of {\bf RQ4} is to determine if, for most programs, one half of the budget is fuzzing mutants too long (such that diminishing returns have set in before this point, usually) or if further fuzzing of mutants, up to essentially the full budget, would continue to be useful, allowing for bypassing more difficult barriers to exploration.
+
+Finally, for {\bf RQ5}, while the universalmutator does not label mutations with operators, it is possible to label generated mutants files with the regular expression rule that produced the mutant, and thus categorize mutants broadly, though not using exactly the standard operator definitions.  Given such a categorization, we can determine if inputs produced by certain kinds of mutants tend to produce more new input paths that are valid for the original program, or produce more bugs only detected during mutant fuzzing.  The second question is particularly interesting: while we expect most gains to be derived from using corpus
+inputs to help fuzz the target itself, we observe based on our
+preliminary experiments discussed below, that some bugs may be found
+\emph{only} by fuzzing a mutant.  How often does this happen on real
+programs, and why does it happen?  One possibility of interest is that the coarse heuristics many fuzzers use to avoid storing duplicate crashes \cite{semantic-crash-bucketing,mdebug} may sometimes discard non-redundant bugs, and that program mutants interact with AFL's heuristics to prevent this in some cases.  {\bf RQ5} is more exploratory than the other research questions, in part aiming to discover which of the kinds of patterns proposed in the introduction appear most in practice.  However, results for {\bf RQ5} might also have more pragmatic importance, in informing refinement of mutant prioritization.
+
+The set of experimental configurations shown below in the preliminary experiments gives an idea of the basic parameters to be varied.  The set of fuzzers included in the real experiment will be larger and there will also be an exploration of different choices for the portion of the time budget devoted to fuzzing mutants.  The experiments will be based on widely-used benchmarks, and conform to the standards proposed by Klees et. al \cite{evalfuzz}, e.g., using 10 or
 more runs of 24 hours each in experimental trials.  We will make every effort to identify and protect against the usual threats to validity in fuzzing experiments, by using a range of benchmark subjects and avoiding pitfalls such as measuring only crash counts bucketed crashes, rather than making an effort to identify actual distinct faults \cite{FuzzAppeal} (or using only crashes, not crashes and code coverage results).
 
 Our plan is to make use of Google's FuzzBench \cite{metzman2021fuzzbench} (\url{https://google.github.io/fuzzbench/}) to perform primary experiments.  The lead of the FuzzBench team has extended an invitation to do so, and started discussing the details of compling and selecting mutants with us.  Using FuzzBench will allow us to perform extensive experiments in a well-curated configuration, over a number of important fuzzers and benchmarks.  Ideally, we can compare performance with and without (variants of) our approach on all of these fuzzers.  Use of FuzzBench will limit the potential for experimental error or poor experimental design choices, and make future comparison with other fuzzing techniques easier.
 
-We would like to also evaluate our approach against T-Fuzz \cite{tfuzz}, but the last commit to the repository (\url{https://github.com/HexHive/T-Fuzz}) was in December of 2018, and our early efforts to get the tool to build and operate in an environment comparable to what will be used for other fuzzers has not been promising (the versions of angr and other required tools are ancient and do not work with recent versions of Linux).  We will continue to explore this possibility, and potentially run an independent smaller comparison outside the FuzzBench context, if we can get T-Fuzz to work using the T-Fuzz docker image.
-
-In addition to the primary research questions above, we plan to
-examine other practically important aspects of mutant fuzzing.  For
-instance, while we expect most gains to be derived from using corpus
-inputs to help fuzz the target itself, we also believe, based on our
-preliminary experiments discussed below, that some bugs may be found
-only by fuzzing a mutant.  How often does this happen on real
-programs, and why does it happen?  One possibility of interest is that the coarse heuristics many fuzzers use to avoid storing duplicate crashes \cite{semantic-crash-bucketing,mdebug} may sometimes discard non-redundant bugs, and that program mutants interact with AFL's heuristics to prevent this in some cases.  We also plan to identify particular mutants that contributed to hitting hard-to-reach program paths, in order to better understand if there are patterns in useful mutants that can be predicted.
+We would like to also evaluate our approach against T-Fuzz \cite{tfuzz}, but the last commit to the repository (\url{https://github.com/HexHive/T-Fuzz}) was in December of 2018, and our early efforts to get the tool to build and operate in an environment comparable to what will be used for other fuzzers has not been promising (the versions of angr and other required tools are ancient and do not work with recent versions of Linux).  We will continue to explore this possibility, and potentially run an independent smaller comparison outside the FuzzBench context, if we can get T-Fuzz to work using the T-Fuzz docker image.  We also plan to reach out to Yoshiki Takashima, who has a more recent fork of T-Fuzz that may resolve some issues we encountered (\url{https://github.com/YoshikiTakashima/T-Fuzz/blob/master/setup}).
