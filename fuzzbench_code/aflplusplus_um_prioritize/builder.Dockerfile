@@ -17,7 +17,7 @@ FROM $parent_image
 
 RUN apt-get update && apt-get install -y python3
 RUN pip3 install --upgrade --force pip
-RUN pip install universalmutator
+RUN pip install universalmutator tqdm
 
 # Install libstdc++ to use llvm_mode.
 RUN apt-get update && \
