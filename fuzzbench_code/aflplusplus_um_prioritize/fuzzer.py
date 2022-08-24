@@ -35,16 +35,15 @@ from fuzzers import utils
 
 import signal
 from contextlib import contextmanager
-from tqdm import tqdm
 
 class TimeoutException(Exception): pass
 
-TOTAL_FUZZING_TIME = 23 # 23 hours
-TOTAL_BUILD_TIME = 12 # 12 hours
+TOTAL_FUZZING_TIME_DEFAULT = 82800 # 23 hours
+TOTAL_BUILD_TIME = 43200 # 12 hours
 FUZZ_PROP = 0.5
 DEFAULT_MUTANT_TIMEOUT = 300
 PRIORITIZE_MULTIPLIER = 5
-GRACE_TIME = 60  * 60 # 1 hour in seconds
+GRACE_TIME = 3600 # 1 hour in seconds
 
 @contextmanager
 def time_limit(seconds):
@@ -78,9 +77,10 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
         aflplusplus_fuzzer.build()
         shutil.copy(f"{out}/{orig_fuzz_target}", f"{mutate_bins}/{orig_fuzz_target}")
     benchmark = os.getenv("BENCHMARK")
+    TOTAL_FUZZING_TIME = int(os.getenv('MAX_TOTAL_TIME', str(TOTAL_FUZZING_TIME_DEFAULT))) 
 
     SOURCE_EXTENSIONS = [".c"] #[".c", ".cc", ".cpp", ".cxx", ".h", ".hpp", ".hxx"]
-    NUM_MUTANTS = math.ceil((TOTAL_FUZZING_TIME * FUZZ_PROP * 60 * 60) / DEFAULT_MUTANT_TIMEOUT) # 23 hours - half fuzzing mutants * 60 (convert to mins) * 60 (secs) / 5 mins/mutant
+    NUM_MUTANTS = math.ceil((TOTAL_FUZZING_TIME * FUZZ_PROP) / DEFAULT_MUTANT_TIMEOUT) # 23 hours - half fuzzing mutants * 60 (convert to mins) * 60 (secs) / 5 mins/mutant
     # Use heuristic to try to find benchmark directory, otherwise look for all files in the current directory.
     subdirs = [name for name in os.listdir(src) if os.path.isdir(os.path.join(src, name))]
     benchmark_src_dir = src
@@ -97,7 +97,7 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
     print(NUM_PRIORITIZED)
 
     prioritize_map = {}
-    for source_file in tqdm(source_files):
+    for source_file in source_files:
         source_dir = os.path.dirname(source_file).split(src, 1)[1]
         Path(f"{mutate_dir}/{source_dir}").mkdir(parents=True, exist_ok=True)
         os.system(f"mutate {source_file} --mutantDir {mutate_dir}/{source_dir} --noCheck > /dev/null")
@@ -129,7 +129,7 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
     curr_time = time.time()
 
     # Add grace time for final build at end
-    remaining_time = int((TOTAL_BUILD_TIME * 60 * 60) - (start_time - curr_time) - GRACE_TIME)
+    remaining_time = int(TOTAL_BUILD_TIME - (start_time - curr_time) - GRACE_TIME)
 
     try:
         with time_limit(remaining_time):
@@ -138,7 +138,7 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
             while num_non_buggy <= NUM_MUTANTS and ind < len(order):
                 with utils.restore_directory(src), utils.restore_directory(work):
                     key, line = order[ind]
-                    mutant = prioritize_map[key][line] # mutants[ind] 
+                    mutant = prioritize_map[key][line] 
                     print(mutant)
                     suffix = "." + mutant.split(".")[-1]
                     mpart = ".mutant." + mutant.split(".mutant.")[1]
@@ -177,10 +177,11 @@ def build():  # pylint: disable=too-many-branches,too-many-statements
 
 def fuzz(input_corpus, output_corpus, target_binary):
     """Run fuzzer."""
-    TOTAL_MUTANT_TIME = int((FUZZ_PROP * TOTAL_FUZZING_TIME * 60 * 60)) 
+    TOTAL_FUZZING_TIME = int(os.getenv('MAX_TOTAL_TIME', str(TOTAL_FUZZING_TIME_DEFAULT))) 
+    TOTAL_MUTANT_TIME = int(FUZZ_PROP * TOTAL_FUZZING_TIME) 
 
     mutants = glob.glob(f"{target_binary}.*")
-    TIMEOUT = int(TOTAL_MUTANT_TIME / len(mutants))
+    TIMEOUT = int(TOTAL_MUTANT_TIME / max(len(mutants), 1))
 
     input_corpus_dir = "/storage/input_corpus"
     os.mkdir("/storage")
