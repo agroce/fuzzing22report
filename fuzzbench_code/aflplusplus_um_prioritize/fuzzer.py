@@ -181,6 +181,7 @@ def fuzz(input_corpus, output_corpus, target_binary):
     TOTAL_MUTANT_TIME = int(FUZZ_PROP * TOTAL_FUZZING_TIME) 
 
     mutants = glob.glob(f"{target_binary}.*")
+    random.shuffle(mutants)
     TIMEOUT = int(TOTAL_MUTANT_TIME / max(len(mutants), 1))
 
     input_corpus_dir = "/storage/input_corpus"
