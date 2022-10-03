@@ -1,0 +1,22 @@
+\section{Experimental Results}
+
+\subsection{T-Fuzz}
+
+Unfortunately, we were unable to compare with T-Fuzz \cite{tfuzz}.  We attempted to contact the authors, and did contact the author of a more recent fork of the T-Fuzz code, Yoshiki Takashima, who directed us to contact Maverick Woo, who might be able to shed more light on running T-Fuzz.  Both confirmed that they had been unable to get T-Fuzz to run properly after attempting to do so.
+
+We also explored using a Docker image for T-Fuzz (\url{https://hub.docker.com/r/zjuchenyuan/tfuzz}) that contained numerous comments on the original experiments, including some notes on problems with those experiments, developed by the authors of T-Fuzz.  Unfortunately, all T-Fuzz benchmarks, after about ten minutes of fuzzing, with no results produced, terminated with the following form of error message:
+
+\begin{code}
+  Traceback (most recent call last):
+  File "./TFuzz", line 64, in <module>
+    main()
+  File "./TFuzz", line 55, in main
+    tfuzzsys.run()
+  File "/T-Fuzz/tfuzz/tfuzz\_sys.py", line 204, in run
+    shutil.copyfile(self.fuzzing\_program.program\_path, transformed\_program\_path)
+  File "/usr/lib/python2.7/shutil.py", line 69, in copyfile
+    raise Error("`\%s` and `\%s` are the same file" \% (src, dst))
+shutil.Error: `/T-Fuzz/workdir\_uniq/uniq\_5/uniq` and `/T-Fuzz/workdir\_uniq/uniq\_5/uniq` are the same file
+\end{code}
+
+Substantial inspection of the source code and further investigation did not result in any way to work around this error, and notes on the Docker suggested that recreating the original experiments might be difficult.  We did, however, use the benchmarks T-Fuzz chose as the basis for our non-FuzzBench experiments.
