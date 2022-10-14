@@ -244,7 +244,7 @@ To reproduce our results for RQ1, RQ2, RQ3 and RQ4, simply head to fuzzbench's m
 \url{https://github.com/google/fuzzbench/blob/master/service/experiment-requests.yaml}. This file lists all experiments to be run on Google Cloud Servers. Below are snippets to
 add to the file for each RQ:
 
-RQ1, RQ2, RQ4:
+RQ1, RQ2, RQ3, RQ4:
 \begin{code}
 \- experiment: <YOUR NAME HERE>
     description: "<YOUR DESCRIPTION HERE>"
@@ -252,14 +252,16 @@ RQ1, RQ2, RQ4:
       \- aflplusplus
       \- aflplusplus\_um\_random
       \- aflplusplus\_um\_prioritize
+      \- aflplusplus\_um\_random\_75
+      \- aflplusplus\_um\_prioritize\_75
       \- aflplusplus\_um\_parallel
       \- honggfuzz
       \- honggfuzz\_um\_random
       \- honggfuzz\_um\_prioritize
+      \- honggfuzz\_um\_random\_75
+      \- honggfuzz\_um\_prioritize\_75
       \- honggfuzz\_um\_parallel
 \end{code}
-
-RQ3: TODO: add RQ3 steps here
 
 For analysis on this fuzzbench data, reports are available at \url{https://www.fuzzbench.com/reports/experimental/}. These reports show a comparison of our fuzzer against existing 
 fuzzers along with 95\% confidence intervals needed to determine if the differences we see are statistically significant.
