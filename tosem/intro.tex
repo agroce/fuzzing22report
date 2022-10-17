@@ -164,3 +164,25 @@ extremely high coverage and overall quality.  Mutation testing is supported by w
 commonly used (and many uncommonly used) programming languages.
 
 Moreover, by operating at the level of source modifications to the program being fuzzed, the proposed technique is agnostic as to the actual fuzzer used.  There is no need to implement fuzzing-of-mutants for each fuzzer of interest; the method operates completely at the level of orchestration of fuzzing results.
+
+
+This paper makes the following contributions:
+
+\begin{itemize}
+\item We propose a basic method for fuzzing using program mutants.
+  The approach is easy to implement, and essentially applicable to any
+  corpus-based fuzzer.
+  \item We demonstrate, by a FuzzBench-based evaluation, that our
+    approach is able to produce dramatic, statistically significant
+    improvements over using state-of-the-art fuzzers on only the
+    original program.  In fact, a variation of our approach (using
+    either random or heuristically selected mutants) scores best by
+    both of the primary FuzzBench evaluation methods, for a large set
+    of benchmarks, compared to the AFLplusplus and Honggfuzz fuzzers.
+    AFLplusplus and Honggfuzz are state-of-the-art fuzzers that
+    routinely place at or near the top of FuzzBench evaluations,
+    showing that our method can improve even  the best fuzzers now available.
+    \item We provide a substantial independent commentary on the
+      process of using FuzzBench, and the benefits and challenges of
+      using FuzzBench in fuzzing research.
+\end{itemize}

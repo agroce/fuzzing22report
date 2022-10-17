@@ -10,8 +10,9 @@ generated to fuzz the SUT can allow a fuzzer to explore more behaviors
 than spending the entire fuzzing budget on the SUT.  The approach
 works because fuzzing most mutants is ``almost'' fuzzing the SUT, but
 may change behavior in ways that allow a fuzzer to reach deeper
-program behaviors.  Our preliminary results show that fuzzing mutants
-is trivial to implement, and provides clear, statistically significant, benefits in terms of fault
-detection for a non-trivial benchmark program; these benefits are
-robust to a variety of detailed choices as to how to make use of
-mutants in fuzzing.  The proposed approach is fuzzer-agnostic, applicable to any corpus-based fuzzer.
+program behaviors.  Our results using Google's FuzzBench platform show that fuzzing mutants
+is trivial to implement and fuzzer-agnostic, but provides clear, statistically significant
+benefits in terms of branch coverage for a number of
+real-world benchmarks, using AFLplusplus and Honggfuzz as baseline
+fuzzers.  One of the variants of our method ranks first by both of the two standard measures of fuzzer effectiveness
+provided by FuzzBench.  
