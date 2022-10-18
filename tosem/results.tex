@@ -2,22 +2,7 @@
 
 \subsection{RQ1: Basic Effectiveness}
 
-\begin{figure}
-  \includegraphics[width=0.75\columnwidth]{bloaty_fuzz_target_boxplot.pdf}
-  \caption{AFLplusplus with and without (random) mutant fuzzing: final branch coverage}
-  \label{fig:bloatybox}
-  
-\end{figure}
-
-\begin{figure}
-  \includegraphics[width=0.75\columnwidth]{bloaty_fuzz_target_coverage_growth.pdf}
-  \caption{AFLplusplus with and without (random) mutant fuzzing: branch coverage growth}
-  \label{fig:bloatygrowth}  
-  \end{figure}
-
-  Figures \ref{fig:bloatybox} and \ref{fig:bloatygrowth} show that in some cases the impact of analyzing mutants can be a large improvement in code coverage.  In all of our FuzzBench results, {\tt um\_random} indicates fuzzing including mutants, without mutant prioritization; similarly, {\tt fuzzername\_um\_prioritize} would indicate fuzzing with baseline fuzzer {\tt fuzzername} and prioritized mutants.  We indicate deviations from our default 0.50 mutant-fuzzing budget by appending the fraction of the overall fuzzing budget spent on mutants, e.g., {\tt honggfuzz\_um\_prioritize\_75} would indicate fuzzing using Honggfuzz on prioritized mutants, where only the last 25\% of the fuzzing budget was spent fuzzing the original program.
-
-Bloaty (\url{https://github.com/google/bloaty}) is not a toy program; like all FuzzBench benchmarks, it is a real-world program, in this case with nearly 4,000 GitHub stars, and over 7,700 lines of code.  Baseline AFLplusplus weak performance shows that it is not an easy target to fuzz effectively.  Such dramatic improvements, with an effect size of hundreds of branches, with a Mann-Whitney U-test $p$-value of less than 0.001, and a 1.0 probability that mutant-based fuzzing outperforms the base fuzzer, were rare.  However, the overall results support the utility of our approach, using AFLplusplus (\url{https://github.com/AFLplusplus/AFLplusplus}) and Honggfuzz (\url{https://github.com/google/honggfuzz}) as our baseline fuzzers:
+FuzzBench results support the utility of our approach, using AFLplusplus (\url{https://github.com/AFLplusplus/AFLplusplus}) and Honggfuzz (\url{https://github.com/google/honggfuzz}) as our baseline fuzzers:
 
   \begin{itemize}
   \item Using the first of FuzzBench's standard evaluation measures, ``based on the average of per-benchmarks scores, where the score represents the percentage of the highest reached median code-coverage on a given benchmark (higher value is better)'', the best performing fuzzer in our experiments was AFLplusplus using prioritized mutants, with a normalized score of 97.91.  The next best fuzzer, AFLplusplus without mutants, had a score of 97.64.  Honggfuzz with prioritized (97.45) or randomly chosen (97.0) mutants also performed better than baseline Honggfuzz (96.97) by this measure.
@@ -29,17 +14,17 @@ Bloaty (\url{https://github.com/google/bloaty}) is not a toy program; like all F
         Fuzzer & Average Normalized Branch Coverage \\
         \hline
         \hline
-aflplusplus\_um\_prioritize & 97.91 \\
-aflplusplus & 97.64 \\
-aflplusplus\_um\_random\_75 & 97.60 \\
-honggfuzz\_um\_prioritize & 97.45 \\ 
-honggfuzz\_um\_random & 97.00 \\
-honggfuzz & 96.97 \\
-aflplusplus\_um\_random & 96.16 \\
-honggfuzz\_um\_prioritize\_75 & 96.15 \\
-honggfuzz\_um\_random\_75 & 95.29 \\
+AFLplusplus prioritize & 97.91 \\
+AFLplusplus  & 97.64 \\
+AFLplusplus random (75\%) & 97.60 \\
+Honggfuzz prioritize & 97.45 \\ 
+Honggfuzz random & 97.00 \\
+Honggfuzz & 96.97 \\
+AFLplusplus random & 96.16 \\
+Honggfuzz prioritize (75\%) & 96.15 \\
+Honggfuzz random (75\%) & 95.29 \\
       \end{tabular}
-      \caption{Ranking by Average Normalized Branch Coverage}
+      \caption{Ranking by Average Normalized Branch Coverage.  prioritize indicates fuzzing using prioritized mutants, random indicates fuzzing using randomly chosen mutants.  (75\%) indicates cases where mutants were used for 75\% of the fuzzing budget rather than our default choice of 50\%.}
       \label{tab:rankings1}
     \end{table}
 
@@ -48,17 +33,17 @@ honggfuzz\_um\_random\_75 & 95.29 \\
         Fuzzer & Average Fuzzer Rank \\
         \hline
         \hline
-aflplusplus\_um\_prioritize & 3.11 \\
-aflplusplus\_um\_random\_75 & 3.27 \\
-aflplusplus\_um\_random & 3.32 \\
-aflplusplus & 3.52 \\
-honggfuzz & 3.82 \\
-honggfuzz\_um\_prioritize & 4.13 \\
-honggfuzz\_um\_prioritize\_75 & 4.90 \\
-honggfuzz\_um\_random\_75 & 5.00 \\
-honggfuzz\_um\_random & 5.18 \\
+AFLplusplus prioritize & 3.11 \\
+AFLplusplus random (75\%) & 3.27 \\
+AFLplusplus random & 3.32 \\
+AFLplusplus & 3.52 \\
+Honggfuzz & 3.82 \\
+Honggfuzz prioritize & 4.13 \\
+Honggfuzz prioritize (75\%) & 4.90 \\
+Honggfuzz random (75\%) & 5.00 \\
+Honggfuzz random & 5.18 \\
       \end{tabular}
-      \caption{Ranking by Average Fuzzer Rank}
+      \caption{Ranking by Average Fuzzer Rank.  prioritize indicates fuzzing using prioritized mutants, random indicates fuzzing using randomly chosen mutants.  (75\%) indicates cases where mutants were used for 75\% of the fuzzing budget rather than our default choice of 50\%.}
       \label{tab:rankings2}
     \end{table}
     
@@ -106,11 +91,29 @@ Mean & 93.57 & 94.00 & 93.43 & {\bf 94.26} & 92.72 & 93.55 & 92.12 & 92.10 & 91.
 
     Finally, Table \ref{tab:fullfuzzbench} shows complete results for all benchmarks and fuzzers.  {\bf N/A} indicates that a particular run failed, usually due to build issues; note that this sometimes happened, due to the stress on the build assumptions discussed below, even for baseline fuzzers.  The median and mean fuzzer statistics here are computed without the normalization used in the standard rankings shown above, but are still indicative of overall fuzzer performance, assuming no bias in missing results, and are of course valid for use in comparing pairs of fuzzers on a single benchmark.  Again, methods using mutants scored highest for both median and mean branch coverage.  To see full results, including statistical significance (most differences were significant at the $p$ < 0.05 level), please see the complete FuzzBench generated report merging all of our experiments (\url{https://github.com/agroce/fuzzing22report/blob/master/fuzzbench_report_10_17/report}).  The original experiment runs are available at the FuzzBench site (\url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-1/index.html}, \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-2/index.html}, \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-4/index.html}, and \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-5/index.html}).
 
-    While our results are limited, we note that mutants seemed to have better impact on AFLplusplus than on Honggfuzz.  Even so, out of  the 16 benchmarks where we have results for both base Honggfuzz and and Honggfuzz over prioritized mutants, the prioritized approach performs better in terms of median branch coverage for 9 benchmarks.  Moreover, the impact was sometimes large:  for the lcms-2017-03-21 benchmark, for example, baseline Hongfuzz only covered a median of 66.81\% of the best achieved branch coverage; using prioritized mutants improved this to a median of 88.32\% of best branch coverage, with a $p$-value of < 0.05.
+While our results are limited, we note that mutants seemed to have better impact on AFLplusplus than on Honggfuzz.  Even so, out of  the 16 benchmarks where we have results for both base Honggfuzz and and Honggfuzz over prioritized mutants, the prioritized approach performs better in terms of median branch coverage for nine benchmarks.  Moreover, the impact was sometimes large:  for the lcms-2017-03-21 benchmark, for example, baseline Hongfuzz only covered a median of 66.81\% of the best achieved branch coverage; using prioritized mutants improved this to a median of 88.32\% of best branch coverage, with a $p$-value of < 0.05.
+
+For full details of the way experiment are performed, we refer the reader to FuzzBench documentation at \url{https://google.github.io/fuzzbench/faq/}.  Source code for our FuzzBench-evaluated fuzzers can be found in \url{https://github.com/google/fuzzbench/tree/master/fuzzers}.  Our fuzzers are: {\tt aflplusplus\_um\_prioritize}, {\tt aflplusplus\_um\_random}, {\tt honggfuzz\_um\_prioritize}, {\tt honggfuzz\_um\_random}, plus the {\tt \_75} minimal variants that change a constant controlling the portion of the run spent fuzzing mutants.  Also present in the directory are {\tt \_um\_parallel} fuzzers that have not yet been tested in working experiments.  Note that we simply use the standard FuzzBench implementations of AFLplusplus and Honggfuzz baselines.
 
 \subsubsection{Individual Benchmark Fuzzing Impacts}
     
 Restricting our attention to comparisons of AFLplusplus with AFLplusplus over randomly chosen mutants for half the fuzzing budget, we can observe that the effect of fuzzing mutants can be dramatic, and can vary considerably.  We focus on randomly chosen mutants despite the overall superior performance of prioritized mutants in order to show that even with random selection of mutants, the variance for fuzzing can in many cases be no greater than for fuzzing without mutants.  Full results for this comparison can be examined in the FuzzBench report repository: \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-1/index.html}.
+
+\begin{figure}
+  \includegraphics[width=0.75\columnwidth]{bloaty_fuzz_target_boxplot.pdf}
+  \caption{AFLplusplus with and without (random) mutant fuzzing: final branch coverage}
+  \label{fig:bloatybox}
+  
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=0.75\columnwidth]{bloaty_fuzz_target_coverage_growth.pdf}
+  \caption{AFLplusplus with and without (random) mutant fuzzing: branch coverage growth}
+  \label{fig:bloatygrowth}  
+  \end{figure}
+
+  Figures \ref{fig:bloatybox} and \ref{fig:bloatygrowth} show that in some cases the impact of analyzing mutants can be a very large improvement in code coverage.  In these graphs, directly generated by FuzzBench, {\tt aflplusplus\_um\_random} indicates fuzzing using randomly chosen mutants (um here stands for ``universalmutator'').
+Bloaty (\url{https://github.com/google/bloaty}) is not a toy program; like all FuzzBench benchmarks, it is a real-world program, in this case with nearly 4,000 GitHub stars, and over 7,700 lines of code.  Baseline AFLplusplus weak performance shows that it is not an easy target to fuzz effectively.
 
 \begin{figure}
   \includegraphics[width=0.75\columnwidth]{php_php-fuzz-parser_boxplot.pdf}
@@ -125,7 +128,7 @@ Restricting our attention to comparisons of AFLplusplus with AFLplusplus over ra
   \label{fig:phpgrowth}  
 \end{figure}
 
-Figures \ref{fig:phpbox} and \ref{fig:phpgrowth} show that the impact of mutant fuzzing is not always, as with the bloaty benchmark, evident during the mutant-fuzzing phase.  Here, the (consistent) advantage over AFLplusplus only appears after fuzzing has swiched to the original target program.  Presumably, seeds generated by some mutants ``pay off'' during the final run of original-target fuzzing.  Again we note that many mutants are likely essentially equivalent in their impact on fuzzing, since the confidence intervals on branch coverage are tight despite the use of randomly selected, likely non-overlapping, mutants in these runs and the bloaty runs.
+Figures \ref{fig:phpbox} and \ref{fig:phpgrowth} show that the impact of mutant fuzzing is not always evident during the mutant-fuzzing phase.  Here, the (consistent) advantage over AFLplusplus only appears after fuzzing has swiched to the original target program.  Presumably, seeds generated by some mutants ``pay off'' during the final run of original-target fuzzing.  We note that here and with the bloaty benchmrk, many mutants seem to be essentially equivalent in their impact on fuzzing, since the confidence intervals on branch coverage are tight despite the use of randomly selected, likely non-overlapping mutants.
 
 \begin{figure}
   \includegraphics[width=0.75\columnwidth]{sqlite3_ossfuzz_boxplot.pdf}
@@ -144,12 +147,16 @@ Finally, it is not always the case that mutants having a strong impact on fuzzin
 
  \subsection{RQ2: Effects of Mutant Prioritization}
 
-In all cases, the prioritized variants of the approach scored better than using randomly chosen mutants.  We would need more fuzzers to be sure that this effect persists across all fuzzers, but our results suggest that even a simple prioritization designed for human use is also effective for fuzzing purposes.
+In all cases, the prioritized variants of the approach scored better than using randomly chosen mutants, using the core FuzzBench measures.  In this sense, our results suggest that even a simple prioritization designed for human use is also effective for fuzzing purposes.  On the other hand, comparing individual benchmark median branch coverages, there are ten cases where we have both prioritized and random results for a benchmark, for both AFLplusplus and Honggfuzz.  For AFLplusplus, prioritization is better in three cases, and random mutants are better in three cases.  For Honggfuzz, prioritization is better in seven cases, and random is better in only two cases (however one of these is a very large improvement, from 79.22\% coverage to 91.09\% coverage).
+
+\subsection{RQ3: Non-Cumulative vs. Cumulative Approaches}
+
+Unfortunately, we were unable to run any experiments using the non-cumulative approach.  We discuss the reasons for this omission in detail below.
 
 \subsection{RQ4: Effects of Varying Mutant-Fuzzing Budget}
 
-We would need more fuzzers and more budget allocations to make any claims (and at minimum data for an AFLplusplus prioritized longer mutant phase).  By both FuzzBench measures, AFLplusplus random mutants were improved by running longer, but for Honggfuzz, using 75\% of the time for mutants performed worse by average normalized branch coverage.
-    
+We would need more fuzzers and more budget allocations to make any claims (and at minimum data for an AFLplusplus prioritized longer mutant phase).  By both FuzzBench measures, AFLplusplus random mutants were improved by running longer, but for Honggfuzz, using 75\%  of the time for mutants was worse for both prioritized and random methods, by both standard FuzzBench measures.  Looking at individual benchmarks, sometimes using mutants longer was helpful, and sometimes it was harmful, but we do note that it seems the changes were not as large as when adding mutants to a fuzzer in general, or changing whether prioritization was used.
+
 \subsection{The FuzzBench Experience}
 \label{sec:fuzzexp}
 
