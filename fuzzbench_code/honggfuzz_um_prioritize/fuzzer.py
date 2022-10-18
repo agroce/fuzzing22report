@@ -11,14 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Integration code for AFLplusplus fuzzer."""
-
-# This optimized afl++ variant should always be run together with
-# "aflplusplus" to show the difference - a default configured afl++ vs.
-# a hand-crafted optimized one. afl++ is configured not to enable the good
-# stuff by default to be as close to vanilla afl as possible.
-# But this means that the good stuff is hidden away in this benchmark
-# otherwise.
+"""Integration code for honggfuzz fuzzer."""
 
 import glob
 import os
@@ -32,7 +25,7 @@ import math
 import signal
 from contextlib import contextmanager
 
-from fuzzers.aflplusplus import fuzzer as aflplusplus_fuzzer
+from fuzzers.honggfuzz import fuzzer as honggfuzz_fuzzer
 from fuzzers import utils
 
 
@@ -85,7 +78,7 @@ def build():  # pylint: disable=too-many-locals,too-many-statements,too-many-bra
 
     orig_fuzz_target = os.getenv("FUZZ_TARGET")
     with utils.restore_directory(src), utils.restore_directory(work):
-        aflplusplus_fuzzer.build()
+        honggfuzz_fuzzer.build()
         shutil.copy(f"{out}/{orig_fuzz_target}",
                     f"{mutate_bins}/{orig_fuzz_target}")
         os.system(f"cp -r {out}/* {orig_out}/")
@@ -191,7 +184,7 @@ def build():  # pylint: disable=too-many-locals,too-many-statements,too-many-bra
                             f".{num_non_buggy}"
 
                         os.system(f"rm -rf {out}/*")
-                        aflplusplus_fuzzer.build()
+                        honggfuzz_fuzzer.build()
                         if not filecmp.cmp(f'{mutate_bins}/{orig_fuzz_target}',
                                            f'{out}/{orig_fuzz_target}',
                                            shallow=False):
@@ -232,7 +225,6 @@ def fuzz(input_corpus, output_corpus, target_binary):
 
     input_corpus_dir = "/storage/input_corpus"
     os.makedirs(input_corpus_dir, exist_ok=True)
-    os.environ['AFL_SKIP_CRASHES'] = "1"
 
     for mutant in mutants[:num_mutants]:
         os.system(f"cp -r {input_corpus_dir}/* {input_corpus}/*")
@@ -240,7 +232,7 @@ def fuzz(input_corpus, output_corpus, target_binary):
                 output_corpus):
             try:
                 with time_limit(timeout):
-                    aflplusplus_fuzzer.fuzz(input_corpus, output_corpus, mutant)
+                    honggfuzz_fuzzer.fuzz(input_corpus, output_corpus, mutant)
             except TimeoutException:
                 pass
             except CalledProcessError:
@@ -248,4 +240,4 @@ def fuzz(input_corpus, output_corpus, target_binary):
             os.system(f"cp -r {output_corpus}/* {input_corpus_dir}/*")
 
     os.system(f"cp -r {input_corpus_dir}/* {input_corpus}/*")
-    aflplusplus_fuzzer.fuzz(input_corpus, output_corpus, target_binary)
+    honggfuzz_fuzzer.fuzz(input_corpus, output_corpus, target_binary)
