@@ -96,13 +96,13 @@
 \author{Alex Groce}
 \affiliation{\institution{Northern Arizona University}\country{United States}}
 
+\author{Kush Jain}
+\affiliation{\institution{Carnegie Mellon University}\country{United States}}
+
 \author{Goutamkumar Tulajappa Kalburgi}
 \affiliation{\institution{Northern Arizona University}\country{United States}}
 
 \author{Claire Le Goues}
-\affiliation{\institution{Carnegie Mellon University}\country{United States}}
-
-\author{Kush Jain}
 \affiliation{\institution{Carnegie Mellon University}\country{United States}}
 
 \author{Rahul Gopinath}
@@ -117,7 +117,7 @@
 %% other information printed in the page headers. This command allows
 %% the author to define a more concise list
 %% of authors' names for this purpose.
-\renewcommand{\shortauthors}{Alex Groce, Kush Jain, Rijnard van Tonder, Goutamkumar Tulajappa Kalburgi, Claire Le Goues}
+
 
 %%
 %% end of the preamble, start of the body of the document source.
@@ -126,7 +126,7 @@
 %%
 %% The "title" command has an optional parameter,
 %% allowing the author to define a "short title" to be used in page headers.
-\title{RCR Artifact Report: First, Fuzz the Mutants}
+\title{Registered Report: First, Fuzz the Mutants - RCR Report}
 
 %%
 %% The "author" command and its associated commands are used to define
@@ -147,11 +147,10 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-The artifact present in this report is important to the paper, as it allows anyone to reproduce the results that
-we state, along with access all of the source code that we added for our first, fuzz the mutants approach for both 
-aflplusplus and honggfuzz. The process to reproduce our results and explenation of the artifacts provided are all present
-in this paper. Additionally, the authors have integrated with fuzzbench, a popular fuzzing benchmark suite, to allow for others 
-to easily run experiments using the fuzzers present in this paper over a large variety of fuzzing benchmarks.
+The artifacts for this paper include full source code and raw data for
+our preliminary experiments, plus the source code we contributed to
+Google's FuzzBench platform, which executed the experiments reported
+in the paper.  The full FuzzBench report on our experiments is also included.
 \end{abstract}
 
 %%
@@ -184,11 +183,25 @@ to easily run experiments using the fuzzers present in this paper over a large v
 %% information and builds the first part of the formatted document.
 \maketitle
 
+\section{Overview}
+
 \subsection{Paper}
-In our paper, First, Fuzz the Mutants we present a novel approach to improving the overall performance of traditional fuzzing loops, where 
-we apply mutation analysis to programs that are being fuzzed and perform fuzzing on these binaries first. We then aggregate the outputs of
-fuzzing these binaries and use them as an input corpus to fuzzing the original program. We ask the following research questions, which we answer
-through a combination of large scale experiments on fuzzbench and small scale experiments on TFuzz benchmarks and fuzzgoat:
+
+\subsubsection{Summary.} Our paper proposes that fuzzing can in many cases be improved by
+simply devoting some portion of the fuzzing budget to \emph{mutants}
+of the program to be fuzzed.  We suggest our reasons for this
+hypothesis, and in the original registered report showed promising
+results for a small benchmark example.
+
+\subsubsection{Key claims:}  Our key claim is that devoting 50\% of
+the budget for fuzzing a program to fuzzing source code mutants of
+that program can improve fuzzing outcomes.  A secondary claim is that
+prioritizing mutants by some reasonable scheme (including a kind of
+stratified sampling) will perform better than randomly selecting
+mutants, but that either will be effective.
+
+Our full set of research questions is;
+
 \begin{itemize}
     \item {\bf RQ1}: Can replacing time spent fuzzing a target program with time spent fuzzing mutants of the target program, under at least one configuration, improve
     the effectiveness of fuzzing on average over a variety of target programs?
@@ -196,23 +209,26 @@ through a combination of large scale experiments on fuzzbench and small scale ex
     \item {\bf RQ3:} How do non-cumulative (parallel) and cumulative (sequential) mutant fuzzing compare?
     \item {\bf RQ4:} How does impact of using mutants vary with the fraction of the fuzzing budget devoted to fuzzing mutants, given a good configuration based on results from {\bf RQ2} and {\bf RQ3}?
     \item {\bf RQ5:} Are certain kinds of mutants generally more useful for fuzzing, or generally not useful?  Are these patterns the same or different for new path discovery and novel bug detection?
-\end{itemize}
+    \end{itemize}
 
-For RQ1, we perform a series of large scale experiments on fuzzbench, where we run our mutation guided fuzzing approach on aflplusplus and honggfuzz over all fuzzbench benchmarks. Fuzzbench runs our
-fuzzers for 24 hours, 20 times each. We find that in general, our fuzzers perform similarly to vanilla aflplusplus and vanilla honggfuzz, with the majority of the benchmarks showing all differences between
-our fuzzers and these vanilla fuzzers within a 95\% confidence interval. However, for certain benchmarks with fewer files to mutate, such as bloaty-fuzz-target, our approach performs far better than baselines
-with 95\% confidence intervals not overlapping at all. For sqllite we outperform baselines significantly at first, however as time progresses vanilla fuzzers catch up with our approach.
+    Some of these are not answered in this submission, due to problems
+    with FuzzBench discussed.  However, the core questions, RQ1 and
+    RQ2 are both substantially addressed and confirm our hypotheses.
 
-For RQ2, RQ3, and RQ4 we also use our fuzzbench setup, simply running variants of our fuzzer on the benchmark suite. TODO: Add results here...
+\subsubsection{Key results:} Using the two standard measures of fuzzer
+effectiveness, FuzzBench experiments over a large set of benchmarks
+substantiate our claims.  Using prioritized mutants as targets for
+half of the fuzzing budget of AFLplusplus outperforms baseline
+AFLplusplus and all other fuzzers applied.  Moreover, even random
+selection of mutants does well by various measures, and increases
+branch coverage by a large, statisticaly significant, amount for
+multiple benchmarks.
 
-For RQ5, we were unable to use fuzzbench due to us not being able to access build files that generated the mutants, as these were part of the build docker container that gets removed immediately after the build
-phase of fuzzbench finishes. However, we were able to answer this question through smaller scale experiments on fuzzgoat and TFuzz benchmarks, where we wrote simple code to apply our technique. This code
-is packaged as part of the artifact along with fuzzbench code.
 
 \subsection{Artifact}
 
 \begin{table}
-    \caption{Overview of All Artifacts, Link and License.}
+  {\scriptsize
     \begin{tabular}{lll}
         \toprule
         \bf Description                   & \bf Link  & \bf License \\
@@ -222,52 +238,84 @@ is packaged as part of the artifact along with fuzzbench code.
         aflplusplus\_um\_parallel   & \url{https://github.com/google/fuzzbench/tree/master/fuzzers/aflplusplus_um_parallel} & Apache 2.0       \\
         honggfuzz\_um\_random   & \url{https://github.com/google/fuzzbench/tree/master/fuzzers/honggfuzz_um_random} & Apache 2.0       \\
         honggfuzz\_um\_prioritize   & \url{https://github.com/google/fuzzbench/tree/master/fuzzers/honggfuzz_um_prioritize} & Apache 2.0       \\
-        honggfuzz\_um\_parallel   & \url{https://github.com/google/fuzzbench/tree/master/fuzzers/honggfuzz_um_parallel} & Apache 2.0       \\
-        small scale experiments   & \url{https://github.com/agroce/fuzzing22report/tree/master/code} & Apache 2.0       \\
+        honggfuzz\_um\_parallel   &
+                                    \url{https://github.com/google/fuzzbench/tree/master/fuzzers/honggfuzz_um_parallel}
+                                                      & Apache 2.0
+      \\
+      \hline
+       All FuzzBench code &
+                                                              \url{https://github.com/agroce/fuzzing22report/tree/master/fuzzbench_code}
+                                                      & Apache 2.0 \\
+        Preliminary experiments code  &
+                                    \url{https://github.com/agroce/fuzzing22report/tree/master/code} & Apache 2.0       \\
+      \hline
+      FuzzBench merged report &
+                         \url{https://github.com/agroce/fuzzing22report/tree/master/fuzzbench_report_10_17/report}
+                                                      & Apache 2.0 \\
+      Preliminary experiment raw data &
+                                           \url{https://github.com/agroce/fuzzing22report/tree/master/raw_data/prelim}
+                                                      & Apache 2.0 \\
+      \hline
+      All of the above code and data &
+                                       https://figshare.com/s/834dcaf8eac245371969
+                                                      & Apache 2.0 \\
         \bottomrule
     \end{tabular}
+    }
+    \caption{Overview of All Artifacts, Links and Licenses.}    
     \label{tab:artifacts}
-\end{table}
+  \end{table}
 
-We detail all of the components and steps needed to reproduce our experiments in this section. This includes the code and steps needed to run fuzzbench experiments, along with code to reproduce our smaller
-scale experiments on TFuzz and fuzzgoat benchmarks. 
+Our evidence is in the form of fuzzer run data.  For preliminary
+experiments, this is directories containing AFL runs.  For FuzzBench,
+our evidence is the form of a FuzzBench report generated by merging
+the results from a set of individual experiments (these are also just
+fuzzer run data).  For convenience we
+have included a DOI to a collection of all our code and data.
 
-Table \ref{tab:artifacts} shows all code that we have released and their locations. All code is licensed under Apache 2.0 to ensure ease of use both commercially and academically. This paper
-did not include any evidence collection or generation phase, with all of our evaluation benchmarks already preexisting.
+For data analysis, we used manual inputs for the very small amount of
+data generated in preliminary experiments.  FuzzBench uses its own
+data analysis tools, primarily from pandas and scikit, to our knowledge.
+  
+\section{Prerequisites and Requirements}
 
-\subsubsection{Prerequisites}
-For our fuzzbench experiments, there are no prerequisites, as you can simply request an experiment that will be run on Google Cloud Servers and then receive a report detailing our fuzzer in comparison
-against other fuzzers. For the small scale experiments, we ran them on a Linux machine, with TODO: add specs here.
+Preliminary experiment code should run on any Ubuntu 20.04 or later system in
+which Python and build-essentials (as well as the AFL fuzzer) are
+available.  However, the interest in the preliminary experiments is
+relatively small.
 
-\subsubsection{Steps to Reproduce}
-To reproduce our results for RQ1, RQ2, RQ3 and RQ4, simply head to fuzzbench's main repository \url{https://github.com/google/fuzzbench} and edit the following file 
-\url{https://github.com/google/fuzzbench/blob/master/service/experiment-requests.yaml}. This file lists all experiments to be run on Google Cloud Servers. Below are snippets to
-add to the file for each RQ:
+The core claims of our paper are based on FuzzBench
+\cite{metzman2021fuzzbench}
+(\url{https://google.github.io/fuzzbench/}) experiments.  There is no
+prerequisite for performing experiments in this case; any experiment
+submitted to Google's Cloud Servers as documented on the FuzzBench site
+can include our fuzzers and compare them to other fuzzers.
+To duplicate our experiments, some adjustments to FuzzBench build
+timeouts may be required, as noted in the full paper.  The individual experiment
+runs (if exact duplication is desired) are: \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-1/index.html}, \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-2/index.html}, \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-4/index.html}, and \url{https://fuzzbench.com/reports/experimental/2022-10-13-um-final-5/index.html}.
 
-RQ1, RQ2, RQ3, RQ4:
-\begin{code}
-\- experiment: <YOUR NAME HERE>
-    description: "<YOUR DESCRIPTION HERE>"
-    fuzzers:
-      \- aflplusplus
-      \- aflplusplus\_um\_random
-      \- aflplusplus\_um\_prioritize
-      \- aflplusplus\_um\_random\_75
-      \- aflplusplus\_um\_prioritize\_75
-      \- aflplusplus\_um\_parallel
-      \- honggfuzz
-      \- honggfuzz\_um\_random
-      \- honggfuzz\_um\_prioritize
-      \- honggfuzz\_um\_random\_75
-      \- honggfuzz\_um\_prioritize\_75
-      \- honggfuzz\_um\_parallel
-\end{code}
+\section{Setup}
 
-For analysis on this fuzzbench data, reports are available at \url{https://www.fuzzbench.com/reports/experimental/}. These reports show a comparison of our fuzzer against existing 
-fuzzers along with 95\% confidence intervals needed to determine if the differences we see are statistically significant.
+As noted, the experiments used to substantiate our claims are based on
+adding fuzzers to FuzzBench.  Links above to our individual
+experiments should enable anyone to request a duplicate set of
+experiments.  The FuzzBench team can assist in merging multiple
+experiments into one run.
 
-For our smaller scale experiments... TODO: add steps here
+\section{Steps to Reproduce}
 
+For our primary results, as noted, simply request a set of FuzzBench
+experiments as documented
+(\url{https://google.github.io/fuzzbench/}).  In the future we may
+make newer versions of our fuzzers available that avoid FuzzBench
+build problems, but we plan to leave our original fuzzers in place as
+artifacts for this paper.  It is also possible to run local
+experiments using FuzzBench fuzzers
+(\url{https://google.github.io/fuzzbench/running-a-local-experiment}).
+
+\bibliographystyle{ACM-Reference-Format}
+
+\bibliography{bibliography}
 \end{document}
 \endinput
 %%
